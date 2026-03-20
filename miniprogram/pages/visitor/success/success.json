@@ -2,5 +2,7 @@
   "usingComponents": {},
   "navigationBarTitleText": "报名成功",
   "navigationBarBackgroundColor": "#52c41a",
-  "navigationBarTextStyle": "white"
+  "navigationBarTextStyle": "white",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
 }

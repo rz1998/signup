@@ -1,4 +1,4 @@
-import { activityApi, registrationApi, formFieldApi, shareApi } from '../../utils/request'
+import { activityApi, registrationApi, formFieldApi, shareApi, uploadApi } from '../../utils/request'
 
 Page({
   data: {
@@ -12,6 +12,8 @@ Page({
     formFields: [],
     formData: {},
     fieldErrors: {},
+    // 文件上传中状态
+    uploadingFields: {},
     // 分享追踪
     shareId: '',
     salesId: ''
@@ -181,9 +183,98 @@ Page({
       'radio': '请选择',
       'checkbox': '请选择',
       'select': '请选择',
-      'date': '请选择日期'
+      'date': '请选择日期',
+      'file': '请上传文件'
     }
     return types[type] || '请输入'
+  },
+
+  // 获取文件名（从URL中提取）
+  getFileName(url) {
+    if (!url) return ''
+    // URL可能是完整URL或相对路径
+    const parts = url.split('/')
+    const filename = parts[parts.length - 1]
+    // 解码URL编码的文件名
+    try {
+      return decodeURIComponent(filename)
+    } catch (e) {
+      return filename
+    }
+  },
+
+  // 选择文件
+  chooseFile(e) {
+    const fieldId = e.currentTarget.dataset.field
+    wx.chooseMessageFile({
+      count: 1,
+      success: async (res) => {
+        const tempFile = res.tempFiles[0]
+        // 检查文件大小（10MB = 10 * 1024 * 1024）
+        if (tempFile.size > 10 * 1024 * 1024) {
+          wx.showToast({ title: '文件大小不能超过10MB', icon: 'none' })
+          return
+        }
+        // 检查文件类型
+        const ext = tempFile.name.split('.').pop().toLowerCase()
+        const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx']
+        if (!allowedExts.includes(ext)) {
+          wx.showToast({ title: '不支持的文件格式', icon: 'none' })
+          return
+        }
+        // 设置上传中状态
+        const { uploadingFields } = this.data
+        uploadingFields[fieldId] = true
+        this.setData({ uploadingFields })
+
+        try {
+          const url = await uploadApi.uploadFile(tempFile.path, tempFile.name)
+          // 保存文件URL到formData
+          const { formData } = this.data
+          formData[fieldId] = url
+          this.setData({ formData })
+          wx.showToast({ title: '上传成功', icon: 'success' })
+        } catch (err) {
+          wx.showToast({ title: err.message || '上传失败', icon: 'none' })
+        } finally {
+          const { uploadingFields } = this.data
+          uploadingFields[fieldId] = false
+          this.setData({ uploadingFields })
+        }
+      },
+      fail: (err) => {
+        if (err.errMsg && err.errMsg.indexOf('cancel') === -1) {
+          console.error('选择文件失败:', err)
+          wx.showToast({ title: '选择文件失败', icon: 'none' })
+        }
+      }
+    })
+  },
+
+  // 移除已上传的文件
+  removeFile(e) {
+    const fieldId = e.currentTarget.dataset.field
+    const { formData } = this.data
+    delete formData[fieldId]
+    this.setData({ formData })
+  },
+
+  // 预览文件（图片直接预览，其他尝试下载）
+  previewFile(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    const ext = url.split('.').pop().toLowerCase()
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif']
+    if (imageExts.includes(ext)) {
+      wx.previewImage({ urls: [url] })
+    } else {
+      wx.showToast({ title: '点击文件可下载', icon: 'none' })
+      // 复制链接到剪贴板
+      wx.setClipboardData({
+        data: url,
+        success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+      })
+    }
   },
 
   async handleRegister() {

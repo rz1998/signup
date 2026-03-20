@@ -198,6 +198,18 @@
           </view>
         </picker>
         
+        <!-- 文件上传 -->
+        <view wx:elif="{{item.fieldType === 'file'}}" class="file-upload-wrapper">
+          <view class="file-upload-tip">支持 jpg、png、gif、pdf、doc、docx、xls、xlsx（最大10MB）</view>
+          <view class="file-item" wx:if="{{formData[item.id]}}" bindtap="previewFile" data-url="{{formData[item.id]}}">
+            <text class="file-name">{{getFileName(formData[item.id])}}</text>
+            <text class="file-remove" catchtap="removeFile" data-field="{{item.id}}">×</text>
+          </view>
+          <button wx:else class="btn-upload" bindtap="chooseFile" data-field="{{item.id}}" loading="{{uploadingFields[item.id]}}">
+            选择文件
+          </button>
+        </view>
+        
         <!-- 错误提示 -->
         <text class="field-error" wx:if="{{fieldErrors[item.id]}}">{{fieldErrors[item.id]}}</text>
       </view>

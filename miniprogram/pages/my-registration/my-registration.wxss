@@ -288,3 +288,8 @@
   background: #1890ff !important;
   color: #fff !important;
 }
+
+.file-link {
+  color: #1890ff !important;
+  text-decoration: underline;
+}

@@ -61,7 +61,8 @@
             <block wx:for="{{item.formData}}" wx:for-item="(value, key)" wx:for-index="key" wx:key="key">
               <view class="info-row" wx:if="{{key !== 'phone' && value}}">
                 <text class="label">{{key}}：</text>
-                <text class="value">{{value}}</text>
+                <text wx:if="{{!isFileUrl(value)}}" class="value">{{value}}</text>
+                <text wx:else class="value file-link" bindtap="openFile" data-url="{{value}}">{{getFileNameFromUrl(value)}}</text>
               </view>
             </block>
           </view>

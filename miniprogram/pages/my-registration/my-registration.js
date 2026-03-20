@@ -142,5 +142,40 @@ Page({
       'cancelled': '已取消'
     }
     return statusMap[status] || status
+  },
+
+  // 判断是否为文件URL
+  isFileUrl(value) {
+    if (!value || typeof value !== 'string') return false
+    return value.startsWith('http://') || value.startsWith('https://')
+  },
+
+  // 从URL中提取文件名
+  getFileNameFromUrl(url) {
+    if (!url) return ''
+    const parts = url.split('/')
+    const filename = parts[parts.length - 1]
+    try {
+      return decodeURIComponent(filename)
+    } catch (e) {
+      return filename
+    }
+  },
+
+  // 打开/预览文件
+  openFile(e) {
+    const url = e.currentTarget.dataset.url
+    if (!url) return
+    const ext = url.split('.').pop().toLowerCase()
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif']
+    if (imageExts.includes(ext)) {
+      wx.previewImage({ urls: [url] })
+    } else {
+      wx.showToast({ title: '长按链接复制后下载', icon: 'none' })
+      wx.setClipboardData({
+        data: url,
+        success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+      })
+    }
   }
 })

@@ -191,3 +191,49 @@ export const shareApi = {
   visit: (shareId) =>
     request.get(`/visitor/activity/${shareId}`)
 }
+
+// 文件上传 API
+export const uploadApi = {
+  uploadImage: (filePath, filename) =>
+    request.upload('/upload/image', filePath, filename),
+  uploadFile: (filePath, filename) =>
+    request.upload('/upload/file', filePath, filename)
+}
+
+// 扩展 request 对象添加 upload 方法
+request.upload = function(url, filePath, filename) {
+  return new Promise((resolve, reject) => {
+    const app = getApp()
+    const baseUrl = app.globalData.apiBaseUrl || 'http://192.168.8.230:8082/api/v1'
+    const fullUrl = `${baseUrl}${url}`
+    wx.uploadFile({
+      url: fullUrl,
+      filePath: filePath,
+      name: 'file',
+      header: {
+        ...this.getAuthHeader()
+      },
+      success: (response) => {
+        if (response.statusCode === 200) {
+          try {
+            const data = JSON.parse(response.data)
+            if (data.success && data.data && data.data.url) {
+              resolve(data.data.url)
+            } else {
+              reject(new Error(data.message || '上传失败'))
+            }
+          } catch (e) {
+            reject(new Error('解析响应失败'))
+          }
+        } else {
+          reject(new Error('上传失败'))
+        }
+      },
+      fail: (error) => {
+        console.error('Upload fail:', error)
+        wx.showToast({ title: error.errMsg || '上传失败', icon: 'none' })
+        reject(error)
+      }
+    })
+  })
+}

@@ -343,6 +343,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/api/v1/admin/settings",
 				Handler: saveSettingsHandler(serverCtx),
 			},
+			// ==================== 文件上传 API ====================
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/v1/upload/image",
+				Handler: uploadImageHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/v1/upload/file",
+				Handler: uploadFileHandler(serverCtx),
+			},
 			// ==================== 分享 API ====================
 			{
 				Method:  http.MethodPost,
@@ -1559,6 +1570,54 @@ func updateVisitorRegistrationHandler(svcCtx *svc.ServiceContext) http.HandlerFu
 		}
 		l := logic.NewUpdateVisitorRegistrationLogic(r.Context(), svcCtx)
 		resp, err := l.UpdateVisitorRegistration(id, &req)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, wrapResponse(resp))
+		}
+	}
+}
+
+// ==================== 文件上传 ====================
+
+func uploadImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		l := logic.NewUploadLogic(r.Context(), svcCtx)
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			httpx.ErrorCtx(r.Context(), w, errors.New("解析上传数据失败"))
+			return
+		}
+		file, header, err := r.FormFile("file")
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, errors.New("未找到上传文件"))
+			return
+		}
+		defer file.Close()
+
+		resp, err := l.UploadImage(header)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, wrapResponse(resp))
+		}
+	}
+}
+
+func uploadFileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		l := logic.NewUploadLogic(r.Context(), svcCtx)
+		if err := r.ParseMultipartForm(10 << 20); err != nil {
+			httpx.ErrorCtx(r.Context(), w, errors.New("解析上传数据失败"))
+			return
+		}
+		file, header, err := r.FormFile("file")
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, errors.New("未找到上传文件"))
+			return
+		}
+		defer file.Close()
+
+		resp, err := l.UploadFile(header)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
