@@ -16,7 +16,7 @@
     
     <view class="info-row">
       <text class="label">活动名称</text>
-      <text class="value">{{registration.activityName || registration.activity?.name || '未知活动'}}</text>
+      <text class="value">{{registration.activityName || '未知活动'}}</text>
     </view>
     
     <view class="info-row" wx:if="{{registration.formData}}">
