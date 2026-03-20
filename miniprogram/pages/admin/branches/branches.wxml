@@ -1,0 +1,104 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">分支机构管理</view>
+    <view class="add-btn" bindtap="showAddForm">
+      <text>+ 添加机构</text>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索分支机构名称" bindconfirm="onSearch" />
+  </view>
+
+  <!-- 公司筛选 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{companies}}" range-key="name" bindchange="onFilterCompanyChange">
+      <view class="filter-tag">{{filterCompanyLabel}}</view>
+    </picker>
+  </view>
+
+  <view wx:if="{{loading && branches.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{branches.length === 0}}" class="empty">
+    <text>暂无分支机构</text>
+  </view>
+
+  <view wx:else class="branch-list">
+    <view wx:for="{{branches}}" wx:key="id" class="branch-item">
+      <view class="branch-info">
+        <view class="name">{{item.name}}</view>
+        <view class="meta">
+          <text>所属公司：{{item.companyName || '-'}}</text>
+        </view>
+        <view class="meta">
+          <text>负责人：{{item.leaderName || '-'}}  电话：{{item.leaderPhone || '-'}}</text>
+        </view>
+        <view class="status-badge status-{{item.status}}">
+          {{item.status === 'active' ? '正常' : '禁用'}}
+        </view>
+      </view>
+      <view class="actions">
+        <button size="mini" bindtap="showEditForm" data-branch="{{item}}">编辑</button>
+        <button size="mini" type="warn" bindtap="deleteBranch" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{!hasMore && branches.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view wx:if="{{showForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{isEdit ? '编辑分支机构' : '添加分支机构'}}</view>
+        <view class="close" bindtap="hideForm">×</view>
+      </view>
+
+      <view class="form-body">
+        <view class="form-item">
+          <text class="label">所属公司 *</text>
+          <picker mode="selector" range="{{formCompanies}}" range-key="name" bindchange="onFormCompanyChange">
+            <view class="picker-value">{{formCompanyLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="label">机构名称 *</text>
+          <input class="input" value="{{formData.name}}" bindinput="onInput" data-field="name" placeholder="请输入分支机构名称" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">负责人姓名</text>
+          <input class="input" value="{{formData.leaderName}}" bindinput="onInput" data-field="leaderName" placeholder="请输入负责人姓名" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">负责人电话</text>
+          <input class="input" value="{{formData.leaderPhone}}" bindinput="onInput" data-field="leaderPhone" placeholder="请输入负责人电话" />
+        </view>
+
+        <view class="form-item" wx:if="{{isEdit}}">
+          <text class="label">状态</text>
+          <picker mode="selector" range="{{statuses}}" range-key="label" bindchange="onStatusChange">
+            <view class="picker-value">{{statusLabel}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-footer">
+        <button bindtap="hideForm">取消</button>
+        <button type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

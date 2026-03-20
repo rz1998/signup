@@ -1,0 +1,72 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">{{roleLabel}}</view>
+  </view>
+
+  <!-- 筛选 -->
+  <view class="filter">
+    <picker 
+      range="{{activities}}" 
+      range-key="title" 
+      bindchange="onFilterChange"
+      value="{{filterIndex}}"
+    >
+      <view class="filter-picker">
+        {{filterActivityId ? selectedActivityTitle : '全部活动'}}
+      </view>
+    </picker>
+  </view>
+
+  <view wx:if="{{loading && registrations.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+  
+  <view wx:elif="{{registrations.length === 0}}" class="empty">
+    <text>暂无报名记录</text>
+  </view>
+  
+  <view wx:else class="registration-list">
+    <view wx:for="{{registrations}}" wx:key="id" class="registration-item">
+      <view class="item-header">
+        <view class="activity-title">{{item.activityTitle}}</view>
+        <view class="status-badge status-{{item.status}}">
+          {{item.status === 'pending' ? '待审核' : item.status === 'confirmed' ? '已确认' : item.status === 'cancelled' ? '已拒绝' : '已完成'}}
+        </view>
+      </view>
+      
+      <view class="item-body">
+        <view class="info-row">
+          <text class="label">报名人：</text>
+          <text class="value">{{item.nickname || item.username}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">手机号：</text>
+          <text class="value">{{item.phone}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">报名时间：</text>
+          <text class="value">{{item.createdAt}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.remark}}">
+          <text class="label">备注：</text>
+          <text class="value">{{item.remark}}</text>
+        </view>
+      </view>
+      
+      <view class="item-footer" wx:if="{{item.status === 'pending' && canReview}}">
+        <button size="mini" type="primary" bindtap="reviewRegistration" data-id="{{item.id}}" data-status="confirmed">通过</button>
+        <button size="mini" type="warn" bindtap="reviewRegistration" data-id="{{item.id}}" data-status="cancelled">拒绝</button>
+        <button wx:if="{{canDelete}}" size="mini" bindtap="deleteRegistration" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+    
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+    
+    <view wx:elif="{{!hasMore && registrations.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+</view>

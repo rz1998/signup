@@ -1,0 +1,229 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+  
+  <view wx:elif="{{!activity}}" class="empty">
+    <text>活动不存在</text>
+  </view>
+  
+  <view wx:else class="activity-detail">
+    <!-- 封面图 -->
+    <image 
+      class="cover-image" 
+      src="{{activity.coverImage || '/assets/images/default-cover.png'}}" 
+      mode="aspectFill"
+    />
+    
+    <!-- 活动信息 -->
+    <view class="info-section">
+      <view class="activity-title">{{activity.pageTitle || activity.name}}</view>
+      <view class="activity-subtitle" wx:if="{{activity.pageSubtitle}}">{{activity.pageSubtitle}}</view>
+      
+      <view class="status-badge status-{{activity.status}}">
+        {{activity.status === 'active' ? '报名中' : activity.status === 'in_progress' ? '进行中' : activity.status === 'completed' ? '已结束' : activity.status === 'draft' ? '草稿' : '未知'}}
+      </view>
+      
+      <view class="info-item" wx:if="{{activity.location}}">
+        <text class="label">📍 活动地点</text>
+        <text class="value">{{activity.location}}</text>
+      </view>
+      
+      <view class="info-item" wx:if="{{activity.startDate}}">
+        <text class="label">🕐 开始时间</text>
+        <text class="value">{{activity.startDate}}</text>
+      </view>
+      
+      <view class="info-item" wx:if="{{activity.endDate}}">
+        <text class="label">🕐 结束时间</text>
+        <text class="value">{{activity.endDate}}</text>
+      </view>
+      
+      <view class="info-item">
+        <text class="label">👥 名额限制</text>
+        <text class="value">{{activity.currentParticipants || 0}} / {{activity.maxParticipants || 100}}</text>
+      </view>
+    </view>
+    
+    <!-- 页面描述 -->
+    <view class="description-section" wx:if="{{activity.pageDescription}}">
+      <view class="section-title">{{activity.pageTitle || '活动详情'}}</view>
+      <view class="description">{{activity.pageDescription}}</view>
+    </view>
+    
+    <!-- 报名须知 -->
+    <view class="description-section" wx:if="{{activity.registrationNotice}}">
+      <view class="section-title">报名须知</view>
+      <view class="description">{{activity.registrationNotice}}</view>
+    </view>
+    
+    <!-- 联系方式 -->
+    <view class="description-section" wx:if="{{activity.contactPhone || activity.contactEmail}}">
+      <view class="section-title">联系方式</view>
+      <view class="description" wx:if="{{activity.contactPhone}}">📞 {{activity.contactPhone}}</view>
+      <view class="description" wx:if="{{activity.contactEmail}}">✉️ {{activity.contactEmail}}</view>
+    </view>
+    
+    <!-- 活动描述（备用） -->
+    <view class="description-section" wx:if="{{activity.description && !activity.pageDescription}}">
+      <view class="section-title">活动简介</view>
+      <view class="description">{{activity.description}}</view>
+    </view>
+    
+    <!-- 报名表单 -->
+    <view class="register-section" wx:if="{{activity.status === 'active' || activity.status === 'draft'}}">
+      <view class="section-title">立即报名</view>
+      
+      <view class="form-item">
+        <text class="label">手机号 *</text>
+        <input 
+          class="input" 
+          type="number" 
+          placeholder="请输入手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          maxlength="11"
+        />
+      </view>
+      
+      <!-- 动态表单字段 -->
+      <view wx:for="{{formFields}}" wx:key="id" class="form-item">
+        <text class="label">{{item.fieldName}}{{item.isRequired ? ' *' : ''}}</text>
+        
+        <!-- 单行文本 -->
+        <input 
+          wx:if="{{item.fieldType === 'text'}}" 
+          class="input" 
+          placeholder="{{getFieldTypeLabel(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 多行文本 -->
+        <textarea 
+          wx:elif="{{item.fieldType === 'textarea'}}" 
+          class="textarea" 
+          placeholder="{{getFieldTypeLabel(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 数字 -->
+        <input 
+          wx:elif="{{item.fieldType === 'number'}}" 
+          class="input" 
+          type="number"
+          placeholder="{{getFieldTypeLabel(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 手机号 -->
+        <input 
+          wx:elif="{{item.fieldType === 'tel'}}" 
+          class="input" 
+          type="number"
+          placeholder="{{getFieldTypeLabel(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+          maxlength="11"
+        />
+        
+        <!-- 邮箱 -->
+        <input 
+          wx:elif="{{item.fieldType === 'email'}}" 
+          class="input" 
+          type="text"
+          placeholder="{{getFieldTypeLabel(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 日期 -->
+        <picker 
+          wx:elif="{{item.fieldType === 'date'}}" 
+          mode="date" 
+          bindchange="onFieldInput"
+          data-field="{{item.id}}"
+        >
+          <view class="input picker-view">
+            {{formData[item.id] || getFieldTypeLabel(item.fieldType)}}
+          </view>
+        </picker>
+        
+        <!-- 单选 -->
+        <radio-group 
+          wx:elif="{{item.fieldType === 'radio'}}" 
+          bindchange="onRadioChange"
+          data-field="{{item.id}}"
+        >
+          <view class="radio-group">
+            <label wx:for="{{item.optionsArray}}" wx:key="*">
+              <radio value="{{item.value}}" checked="{{formData[item.id] === item.value}}" />
+              <text>{{item.label}}</text>
+            </label>
+          </view>
+        </radio-group>
+        
+        <!-- 多选 -->
+        <checkbox-group 
+          wx:elif="{{item.fieldType === 'checkbox'}}" 
+          bindchange="onCheckboxChange"
+          data-field="{{item.id}}"
+        >
+          <view class="checkbox-group">
+            <label wx:for="{{item.optionsArray}}" wx:key="*">
+              <checkbox value="{{item.value}}" checked="{{formData[item.id] && formData[item.id].includes(item.value)}}" />
+              <text>{{item.label}}</text>
+            </label>
+          </view>
+        </checkbox-group>
+        
+        <!-- 下拉选择 -->
+        <picker 
+          wx:elif="{{item.fieldType === 'select'}}" 
+          mode="selector" 
+          range="{{item.optionsArray}}" 
+          range-key="label"
+          bindchange="onSelectChange"
+          data-field="{{item.id}}"
+        >
+          <view class="input picker-view">
+            {{formData[item.id] || getFieldTypeLabel(item.fieldType)}}
+          </view>
+        </picker>
+        
+        <!-- 错误提示 -->
+        <text class="field-error" wx:if="{{fieldErrors[item.id]}}">{{fieldErrors[item.id]}}</text>
+      </view>
+      
+      <!-- 备注 -->
+      <view class="form-item">
+        <text class="label">备注</text>
+        <textarea 
+          class="textarea" 
+          placeholder="请输入备注信息（选填）"
+          value="{{remark}}"
+          bindinput="onRemarkInput"
+        />
+      </view>
+      
+      <button 
+        class="btn-primary register-btn" 
+        bindtap="handleRegister"
+        disabled="{{submitting}}"
+      >
+        {{submitting ? '提交中...' : '立即报名'}}
+      </button>
+    </view>
+    
+    <view wx:else class="notice">
+      <text>该活动当前无法报名</text>
+    </view>
+  </view>
+</view>

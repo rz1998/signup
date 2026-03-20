@@ -1,0 +1,238 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.back {
+  color: #1890ff;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+
+.title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.add-btn {
+  background: #1890ff;
+  color: #fff;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.add-btn text {
+  color: #fff;
+}
+
+/* 搜索栏 */
+.search-bar {
+  padding: 0 20rpx 20rpx;
+}
+
+.search-input {
+  height: 72rpx;
+  padding: 0 24rpx;
+  background: #fff;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}
+
+/* 公司列表 */
+.company-list {
+  padding: 0 20rpx;
+}
+
+.company-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.company-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 20rpx;
+  margin-top: 8rpx;
+}
+
+.status-active {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-inactive {
+  background: #fff1f0;
+  color: #f5222d;
+}
+
+.actions {
+  flex-shrink: 0;
+  margin-left: 20rpx;
+  display: flex;
+  gap: 10rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+}
+
+.no-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #ccc;
+  font-size: 24rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+/* 表单弹窗 */
+.form-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-container {
+  width: 85%;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.form-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.form-body {
+  padding: 30rpx;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.form-item .label {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.form-item .input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.form-item .textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.form-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.form-footer button {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.form-footer button:first-child {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form-footer button:last-child {
+  background: #1890ff;
+  color: #fff;
+}
+
+.picker-value {
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  line-height: 80rpx;
+  font-size: 28rpx;
+  color: #333;
+}

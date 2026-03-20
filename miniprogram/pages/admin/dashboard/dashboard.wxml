@@ -1,0 +1,94 @@
+<view class="container">
+  <!-- 用户信息 -->
+  <view class="user-card">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatar || '/assets/icons/default-avatar.png'}}" mode="aspectFill" />
+      <view class="info">
+        <view class="nickname">{{userInfo.nickname || userInfo.username}}</view>
+        <view class="role">
+          {{userRole === 'admin' ? '系统管理员' : userRole === 'mgr' ? '营销管理人员' : userRole === 'sales' ? '营销人员' : userRole}}
+        </view>
+      </view>
+    </view>
+    <view class="logout" bindtap="onLogout">退出</view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-grid">
+    <view class="stat-card" bindtap="navigateTo" data-url="/pages/admin/activities/activities">
+      <view class="stat-value">{{stats.totalActivities}}</view>
+      <view class="stat-label">活动总数</view>
+    </view>
+    <view class="stat-card" bindtap="navigateTo" data-url="/pages/admin/registrations/registrations">
+      <view class="stat-value">{{stats.totalRegistrations}}</view>
+      <view class="stat-label">{{canViewAllRegistrations ? '报名总数' : '我的报名'}}</view>
+    </view>
+    <view wx:if="{{canViewAllRegistrations}}" class="stat-card" bindtap="navigateTo" data-url="/pages/admin/registrations/registrations">
+      <view class="stat-value stat-warning">{{stats.pendingReviews}}</view>
+      <view class="stat-label">待审核</view>
+    </view>
+    <view wx:if="{{canManageUsers}}" class="stat-card" bindtap="navigateTo" data-url="/pages/admin/users/users">
+      <view class="stat-value">{{stats.totalUsers}}</view>
+      <view class="stat-label">用户总数</view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-title">功能菜单</view>
+    <view class="menu-grid">
+      <!-- 公司管理: 仅系统管理员可见 -->
+      <view wx:if="{{canManageCompanies}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/companies/companies">
+        <view class="menu-icon">🏢</view>
+        <view class="menu-label">公司管理</view>
+      </view>
+      <!-- 分支机构管理: 系统管理员 + 公司管理员可见 -->
+      <view wx:if="{{canManageBranches}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/branches/branches">
+        <view class="menu-icon">🏪</view>
+        <view class="menu-label">分支机构</view>
+      </view>
+      <!-- 活动管理: admin + mgr 可见 -->
+      <view wx:if="{{canManageActivities}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/activities/activities">
+        <view class="menu-icon">📝</view>
+        <view class="menu-label">活动管理</view>
+      </view>
+      <!-- 报名管理: 所有人可见（内容按角色过滤） -->
+      <view class="menu-item" bindtap="navigateTo" data-url="/pages/admin/registrations/registrations">
+        <view class="menu-icon">📋</view>
+        <view class="menu-label">{{canViewAllRegistrations ? '报名管理' : '我的报名'}}</view>
+      </view>
+      <!-- 用户管理: 仅admin可见 -->
+      <view wx:if="{{canManageUsers}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/users/users">
+        <view class="menu-icon">👥</view>
+        <view class="menu-label">用户管理</view>
+      </view>
+      <!-- 页面设置: admin + mgr 可见 -->
+      <view wx:if="{{canManageActivities}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/settings/settings">
+        <view class="menu-icon">🎨</view>
+        <view class="menu-label">页面设置</view>
+      </view>
+      <view class="menu-item" bindtap="navigateTo" data-url="/pages/admin/profile/profile">
+        <view class="menu-icon">⚙️</view>
+        <view class="menu-label">个人设置</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近活动: admin + mgr 可见 -->
+  <view wx:if="{{canManageActivities}}" class="recent-section">
+    <view class="section-header">
+      <view class="section-title">最近活动</view>
+      <view class="more" bindtap="navigateTo" data-url="/pages/admin/activities/activities">更多 →</view>
+    </view>
+    <view class="recent-list">
+      <view wx:for="{{recentActivities}}" wx:key="id" class="recent-item">
+        <view class="recent-title">{{item.title}}</view>
+        <view class="recent-meta">
+          <text>{{item.currentParticipants}}/{{item.maxParticipants}}人</text>
+          <text class="status-{{item.status}}">{{item.status === 'published' ? '报名中' : item.status === 'ongoing' ? '进行中' : '已结束'}}</text>
+        </view>
+      </view>
+      <view wx:if="{{recentActivities.length === 0}}" class="empty-tip">暂无活动</view>
+    </view>
+  </view>
+</view>

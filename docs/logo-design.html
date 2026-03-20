@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>报名系统 Logo 设计</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 40px; }
+.container { max-width: 1200px; margin: 0 auto; }
+h1 { text-align: center; color: #1a1a1a; margin-bottom: 40px; font-size: 28px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+.card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center; }
+.card h3 { color: #333; margin: 20px 0 10px; font-size: 18px; }
+.card p { color: #666; font-size: 14px; }
+.logo-container { display: flex; align-items: center; justify-content: center; height: 120px; }
+.icons-row { display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap;}
+
+/* Logo 设计1 - 现代简约 */
+.logo1 { display: flex; align-items: center; gap: 12px; }
+.logo1-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #1890ff 0%, #0050b3 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.logo1-icon svg { width: 28px; height: 28px; fill: white; }
+.logo1-text { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.logo1-text span { color: #1890ff; }
+
+/* Logo 设计2 - 报名主题 */
+.logo2 { display: flex; align-items: center; gap: 10px; }
+.logo2-icon { width: 44px; height: 44px; background: #1890ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; }
+.logo2-icon svg { width: 24px; height: 24px; fill: white; }
+.logo2-text { font-size: 20px; font-weight: 600; color: #333; }
+
+/* 图标样式 */
+.icon-box { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.icon-box svg { width: 32px; height: 32px; fill: white; }
+.icon-box.blue { background: linear-gradient(135deg, #1890ff, #0050b3); }
+.icon-box.green { background: linear-gradient(135deg, #52c41a, #237804); }
+.icon-box.orange { background: linear-gradient(135deg, #fa8c16, #d46b08); }
+.icon-box.purple { background: linear-gradient(135deg, #722ed1, #4a1081); }
+.icon-box.red { background: linear-gradient(135deg, #ff4d4f, #a8071a); }
+.icon-box.cyan { background: linear-gradient(135deg, #13c2c2, #006d75); }
+
+/* 深色版本 */
+.dark-version { background: #1a1a1a; padding: 30px; border-radius: 12px; margin-top: 20px; }
+.dark-version .logo1-text { color: white; }
+.dark-version .logo1-icon { background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%); }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>报名系统 - Logo & 图标设计</h1>
+    
+    <div class="grid">
+        <!-- Logo 主标识 -->
+        <div class="card">
+            <h3>Logo 主标识</h3>
+            <div class="logo-container">
+                <div class="logo1">
+                    <div class="logo1-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </div>
+                    <div class="logo1-text">报名<span>系统</span></div>
+                </div>
+            </div>
+            <p>主Logo - 浅色背景使用</p>
+        </div>
+
+        <!-- Logo 深色版 -->
+        <div class="card">
+            <h3>Logo 深色变体</h3>
+            <div class="logo-container">
+                <div class="dark-version" style="border-radius:12px;">
+                    <div class="logo1" style="justify-content: center;">
+                        <div class="logo1-icon">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </div>
+                        <div class="logo1-text">报名<span>系统</span></div>
+                    </div>
+                </div>
+            </div>
+            <p>深色背景使用</p>
+        </div>
+
+        <!-- Logo 紧凑版 -->
+        <div class="card">
+            <h3>Logo 紧凑版</h3>
+            <div class="logo-container">
+                <div class="logo2">
+                    <div class="logo2-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </div>
+                    <div class="logo2-text">SignUp</div>
+                </div>
+            </div>
+            <p>仅图标+英文</p>
+        </div>
+
+        <!-- 图标组 -->
+        <div class="card">
+            <h3>功能图标</h3>
+            <div class="icons-row">
+                <div class="icon-box blue" title="活动">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div class="icon-box green" title="用户">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="icon-box orange" title="报名">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm1 14H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V7h8v2z"/></svg>
+                </div>
+                <div class="icon-box purple" title="分享">
+                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+                </div>
+                <div class="icon-box red" title="数据">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                </div>
+                <div class="icon-box cyan" title="设置">
+                    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                </div>
+            </div>
+            <p>活动 / 用户 / 报名 / 分享 / 数据 / 设置</p>
+        </div>
+
+        <!-- TabBar 图标 -->
+        <div class="card">
+            <h3>TabBar 图标</h3>
+            <div class="icons-row">
+                <div style="text-align:center;">
+                    <div style="width:48px;height:48px;background:#1890ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    </div>
+                    <p style="font-size:12px;margin-top:8px;color:#666;">首页</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:48px;height:48px;background:#1890ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    </div>
+                    <p style="font-size:12px;margin-top:8px;color:#666;">活动</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:48px;height:48px;background:#1890ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    </div>
+                    <p style="font-size:12px;margin-top:8px;color:#666;">用户</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:48px;height:48px;background:#1890ff;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <p style="font-size:12px;margin-top:8px;color:#666;">我的</p>
+                </div>
+            </div>
+            <p>底部导航图标</p>
+        </div>
+
+        <!-- 颜色规范 -->
+        <div class="card">
+            <h3>色彩规范</h3>
+            <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+                <div style="text-align:center;">
+                    <div style="width:60px;height:60px;background:#1890ff;border-radius:8px;"></div>
+                    <p style="margin-top:8px;font-size:12px;color:#666;">#1890FF<br>主色</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:60px;height:60px;background:#0050b3;border-radius:8px;"></div>
+                    <p style="margin-top:8px;font-size:12px;color:#666;">#0050B3<br>深蓝</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:60px;height:60px;background:#52c41a;border-radius:8px;"></div>
+                    <p style="margin-top:8px;font-size:12px;color:#666;">#52C41A<br>成功</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:60px;height:60px;background:#fa8c16;border-radius:8px;"></div>
+                    <p style="margin-top:8px;font-size:12px;color:#666;">#FA8C16<br>警告</p>
+                </div>
+                <div style="text-align:center;">
+                    <div style="width:60px;height:60px;background:#ff4d4f;border-radius:8px;"></div>
+                    <p style="margin-top:8px;font-size:12px;color:#666;">#FF4D4F<br>错误</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

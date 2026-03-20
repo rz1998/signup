@@ -1,0 +1,53 @@
+Name: signup-api
+Host: 0.0.0.0
+Port: 8082
+
+Log:
+  Mode: console
+  Level: info
+
+Database:
+  Type: postgres
+  Host: postgres
+  Port: 5432
+  DBName: signup_db
+  User: signup_user
+  Password: signup_password
+  SSLMode: disable
+  MaxOpenConns: 20
+  MaxIdleConns: 5
+
+Cache:
+  Type: redis
+  Host: redis
+  Port: 6379
+  Password: ""
+  DB: 0
+
+JWT:
+  Secret: signup-secret-key-2024
+  Expire: 3600
+  Issuer: signup.ai
+  Audience: signup.ai.users
+
+CORS:
+  AllowOrigins:
+    - http://localhost:3000
+    - http://localhost
+  AllowMethods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  AllowHeaders:
+    - Authorization
+    - Content-Type
+    - X-Requested-With
+
+RateLimit:
+  Enabled: false
+  QPS: 100
+
+# 前端访问基础URL，用于生成分享链接
+BaseURL: http://192.168.8.230:8082

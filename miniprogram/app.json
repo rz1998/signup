@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/activity/activity",
+    "pages/my-registration/my-registration",
+    "pages/login/login"
+  ],
+  "subpackages": [
+    {
+      "root": "pages/admin",
+      "name": "admin",
+      "pages": [
+        "dashboard/dashboard",
+        "users/users",
+        "companies/companies",
+        "branches/branches",
+        "activities/activities",
+        "registrations/registrations",
+        "profile/profile",
+        "settings/settings",
+        "activity-config/activity-config",
+        "share/share"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890ff",
+    "navigationBarTitleText": "报名项目",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于展示附近活动"
+    }
+  },
+  "usingComponents": {},
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

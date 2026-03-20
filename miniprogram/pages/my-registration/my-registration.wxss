@@ -1,0 +1,290 @@
+.registration-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.registration-card {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.activity-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.status-badge {
+  padding: 6rpx 16rpx;
+  border-radius: 4rpx;
+  font-size: 22rpx;
+}
+
+.status-pending {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-confirmed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-cancelled {
+  background: #fff1f0;
+  color: #f5222d;
+}
+
+.status-completed {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.card-body {
+  margin-bottom: 16rpx;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  color: #999;
+  min-width: 140rpx;
+}
+
+.value {
+  color: #666;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: #f5222d;
+  border: 1rpx solid #f5222d;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  color: #999;
+}
+
+.empty-action {
+  margin-top: 30rpx;
+  padding: 16rpx 40rpx;
+  background: #1890ff;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.loading {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #999;
+}
+
+.no-more {
+  text-align: center;
+  padding: 40rpx 0;
+  color: #ccc;
+  font-size: 24rpx;
+}
+
+/* 手机号查询 */
+.phone-search {
+  padding: 40rpx;
+  background: #fff;
+  margin: 20rpx;
+  border-radius: 12rpx;
+}
+
+.search-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.search-form {
+  display: flex;
+  gap: 20rpx;
+}
+
+.phone-input {
+  flex: 1;
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.search-btn {
+  width: 180rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  background: #1890ff;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.search-tip {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  margin-bottom: 10rpx;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.change-phone {
+  font-size: 26rpx;
+  color: #1890ff;
+}
+
+.form-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-container {
+  width: 85%;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.form-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.close {
+  font-size: 48rpx;
+  color: #999;
+}
+
+.form-body {
+  padding: 30rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-item .label {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.form-item .input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.form-item .textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 20rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.form-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.form-footer button {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.form-footer button:first-child {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.form-footer button:last-child {
+  background: #1890ff;
+  color: #fff;
+}
+
+.btn-edit {
+  background: #1890ff !important;
+  color: #fff !important;
+}

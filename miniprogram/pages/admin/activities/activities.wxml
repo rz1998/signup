@@ -1,0 +1,166 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">活动管理</view>
+    <view wx:if="{{canManageActivities}}" class="add-btn" bindtap="showAddForm">+ 新建</view>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{companies}}" range-key="name" bindchange="onFilterCompanyChange">
+      <view class="filter-tag">{{filterCompanyLabel}}</view>
+    </picker>
+    <picker mode="selector" range="{{branches}}" range-key="name" bindchange="onFilterBranchChange">
+      <view class="filter-tag">{{filterBranchLabel}}</view>
+    </picker>
+  </view>
+
+  <view wx:if="{{loading && activities.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+  
+  <view wx:elif="{{activities.length === 0}}" class="empty">
+    <text>暂无活动</text>
+  </view>
+  
+  <view wx:else class="activity-list">
+    <view wx:for="{{activities}}" wx:key="id" class="activity-item">
+      <image class="cover" src="{{item.coverImage || '/assets/images/default-cover.png'}}" mode="aspectFill" catchtap="goToDetail" data-id="{{item.id}}" />
+      <view class="content">
+        <view class="title" catchtap="goToDetail" data-id="{{item.id}}">{{item.pageTitle || item.name || '未命名活动'}}</view>
+        <view class="meta">
+          <text catchtap="goToDetail" data-id="{{item.id}}">📍 {{item.location || '未设置地点'}}</text>
+          <text catchtap="goToDetail" data-id="{{item.id}}">👥 {{item.currentParticipants || 0}}/{{item.maxParticipants || 100}}</text>
+        </view>
+        <view class="time" catchtap="goToDetail" data-id="{{item.id}}">
+          <text>🕐 {{item.startDateShort || item.startTime}} - {{item.endDateShort || item.endTime}}</text>
+        </view>
+        <view class="status-badge status-{{item.status}}" catchtap="goToDetail" data-id="{{item.id}}">
+          {{item.status === 'active' ? '报名中' : item.status === 'in_progress' ? '进行中' : item.status === 'completed' ? '已结束' : item.status === 'draft' ? '草稿' : '未知'}}
+        </view>
+      </view>
+      <view class="actions">
+        <button wx:if="{{canManageActivities}}" size="mini" catchtap="showEditForm" data-activity="{{item}}">编辑</button>
+        <button size="mini" type="primary" catchtap="goToSettings" data-activity="{{item}}">页面设置</button>
+        <button size="mini" type="warn" catchtap="onSelectShare" data-activity="{{item}}" open-type="share">分享</button>
+        <button wx:if="{{canDeleteActivities}}" size="mini" type="warn" catchtap="deleteActivity" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+    
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+    
+    <view wx:elif="{{!hasMore && activities.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view wx:if="{{showForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{isEdit ? '编辑活动' : '新建活动'}}</view>
+        <view class="close" bindtap="hideForm">×</view>
+      </view>
+      
+      <view class="form-body">
+        <view class="form-item">
+          <text class="label">活动标题 *</text>
+          <input class="input" data-field="name" value="{{formData.name}}" bindinput="onFormInput" placeholder="请输入活动标题" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">活动地点 *</text>
+          <input class="input" data-field="location" value="{{formData.location}}" bindinput="onFormInput" placeholder="请输入活动地点" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">最大人数 *</text>
+          <input class="input" type="number" data-field="maxParticipants" value="{{formData.maxParticipants}}" bindinput="onFormInput" placeholder="请输入最大参与人数" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">开始时间 *</text>
+          <view class="datetime-picker">
+            <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+              <view class="picker-value">{{startDate || '选择日期'}}</view>
+            </picker>
+            <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+              <view class="picker-value">{{startTime || '选择时间'}}</view>
+            </picker>
+          </view>
+        </view>
+        
+        <view class="form-item">
+          <text class="label">结束时间 *</text>
+          <view class="datetime-picker">
+            <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+              <view class="picker-value">{{endDate || '选择日期'}}</view>
+            </picker>
+            <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+              <view class="picker-value">{{endTime || '选择时间'}}</view>
+            </picker>
+          </view>
+        </view>
+        
+        <view class="form-item">
+          <text class="label">活动描述</text>
+          <textarea class="textarea" data-field="description" value="{{formData.description}}" bindinput="onFormInput" placeholder="请输入活动描述" />
+        </view>
+      </view>
+      
+      <view class="form-footer">
+        <button bindtap="hideForm">取消</button>
+        <button type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 页面设置弹窗 -->
+  <view wx:if="{{showSettings}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">页面设置 - {{settingsActivity.name}}</view>
+        <view class="close" bindtap="hideSettingsForm">×</view>
+      </view>
+      
+      <view class="form-body">
+        <view class="form-item">
+          <text class="label">页面标题</text>
+          <input class="input" value="{{settingsData.pageTitle}}" bindinput="onSettingsInput" data-field="pageTitle" placeholder="留空使用默认" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">页面副标题</text>
+          <input class="input" value="{{settingsData.pageSubtitle}}" bindinput="onSettingsInput" data-field="pageSubtitle" placeholder="留空使用默认" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">页面描述</text>
+          <textarea class="textarea" value="{{settingsData.pageDescription}}" bindinput="onSettingsInput" data-field="pageDescription" placeholder="留空使用默认" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">报名须知</text>
+          <textarea class="textarea" value="{{settingsData.registrationNotice}}" bindinput="onSettingsInput" data-field="registrationNotice" placeholder="留空使用默认" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">联系电话</text>
+          <input class="input" value="{{settingsData.contactPhone}}" bindinput="onSettingsInput" data-field="contactPhone" placeholder="留空使用默认" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">联系邮箱</text>
+          <input class="input" value="{{settingsData.contactEmail}}" bindinput="onSettingsInput" data-field="contactEmail" placeholder="留空使用默认" />
+        </view>
+      </view>
+      
+      <view class="form-footer">
+        <button bindtap="hideSettingsForm">取消</button>
+        <button type="primary" bindtap="saveSettings">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

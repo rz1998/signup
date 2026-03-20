@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">公司管理</view>
+    <view class="add-btn" bindtap="showAddForm">
+      <text>+ 添加公司</text>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索公司名称" bindconfirm="onSearch" />
+  </view>
+
+  <view wx:if="{{loading && companies.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{companies.length === 0}}" class="empty">
+    <text>暂无公司</text>
+  </view>
+
+  <view wx:else class="company-list">
+    <view wx:for="{{companies}}" wx:key="id" class="company-item">
+      <view class="company-info">
+        <view class="name">{{item.name}}</view>
+        <view class="meta">
+          <text>描述：{{item.description || '-'}}</text>
+        </view>
+        <view class="status-badge status-{{item.status}}">
+          {{item.status === 'active' ? '正常' : '禁用'}}
+        </view>
+      </view>
+      <view class="actions">
+        <button size="mini" bindtap="showEditForm" data-company="{{item}}">编辑</button>
+        <button size="mini" type="warn" bindtap="deleteCompany" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{!hasMore && companies.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view wx:if="{{showForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{isEdit ? '编辑公司' : '添加公司'}}</view>
+        <view class="close" bindtap="hideForm">×</view>
+      </view>
+
+      <view class="form-body">
+        <view class="form-item">
+          <text class="label">公司名称 *</text>
+          <input class="input" value="{{formData.name}}" bindinput="onInput" data-field="name" placeholder="请输入公司名称" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">公司描述</text>
+          <textarea class="textarea" value="{{formData.description}}" bindinput="onInput" data-field="description" placeholder="请输入公司描述" />
+        </view>
+
+        <view class="form-item" wx:if="{{isEdit}}">
+          <text class="label">状态</text>
+          <picker mode="selector" range="{{statuses}}" range-key="label" bindchange="onStatusChange">
+            <view class="picker-value">{{statusLabel}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-footer">
+        <button bindtap="hideForm">取消</button>
+        <button type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

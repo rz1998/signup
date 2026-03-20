@@ -1,0 +1,178 @@
+<view class="container">
+  <!-- 手机号查询 -->
+  <view wx:if="{{showPhoneSearch}}" class="phone-search">
+    <view class="search-title">查询我的报名</view>
+    <view class="search-form">
+      <input 
+        class="phone-input" 
+        type="number" 
+        placeholder="请输入您的手机号"
+        value="{{phone}}"
+        bindinput="onPhoneInput"
+        maxlength="11"
+      />
+      <button class="search-btn" bindtap="searchByPhone" loading="{{loading}}">查询</button>
+    </view>
+    <view class="search-tip">请输入您报名时填写的手机号</view>
+  </view>
+
+  <!-- 报名列表 -->
+  <view wx:else>
+    <view class="list-header">
+      <text class="list-title">我的报名</text>
+      <text class="change-phone" bindtap="changePhone">切换手机号</text>
+    </view>
+
+    <view wx:if="{{loading && registrations.length === 0}}" class="loading">
+      <text>加载中...</text>
+    </view>
+    
+    <view wx:elif="{{registrations.length === 0}}" class="empty">
+      <text>未找到报名记录</text>
+    </view>
+    
+    <view wx:else class="registration-list">
+      <view 
+        wx:for="{{registrations}}" 
+        wx:key="id" 
+        class="registration-card"
+      >
+        <view class="card-header">
+          <view class="activity-title">
+            {{item.activityName || '活动'}}
+          </view>
+          <view class="status-badge status-{{item.status}}">
+            {{getStatusText(item.status)}}
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <view class="info-row" wx:if="{{item.startDate}}">
+            <text class="label">活动时间：</text>
+            <text class="value">{{item.startDate}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">报名时间：</text>
+            <text class="value">{{item.createdAt}}</text>
+          </view>
+          
+          <!-- 显示表单数据 -->
+          <view wx:if="{{item.formData}}" class="form-data">
+            <block wx:for="{{item.formData}}" wx:for-item="(value, key)" wx:for-index="key" wx:key="key">
+              <view class="info-row" wx:if="{{key !== 'phone' && value}}">
+                <text class="label">{{key}}：</text>
+                <text class="value">{{value}}</text>
+              </view>
+            </block>
+          </view>
+          
+          <view class="info-row" wx:if="{{item.remark}}">
+            <text class="label">备注：</text>
+            <text class="value">{{item.remark}}</text>
+          </view>
+        </view>
+        
+        <view class="card-footer">
+          <button 
+            wx:if="{{item.status === 'pending'}}"
+            class="btn-edit" 
+            size="mini" 
+            bindtap="showEditForm"
+            data-reg="{{item}}"
+          >
+            修改报名
+          </button>
+          <button 
+            wx:if="{{item.status === 'pending'}}"
+            class="btn-cancel" 
+            size="mini" 
+            bindtap="cancelRegistration"
+            data-id="{{item.id}}"
+          >
+            取消报名
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 修改报名弹窗 -->
+  <view wx:if="{{showEditForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">修改报名</view>
+        <view class="close" bindtap="hideEditForm">×</view>
+      </view>
+      
+      <view class="form-body">
+        <!-- 动态表单字段 -->
+        <view wx:for="{{formFields}}" wx:key="id" class="form-item">
+          <text class="label">{{item.fieldName}}{{item.isRequired ? ' *' : ''}}</text>
+          
+          <input 
+            wx:if="{{item.fieldType === 'text' || item.fieldType === 'tel' || item.fieldType === 'email'}}" 
+            class="input" 
+            value="{{formData[item.id]}}"
+            bindinput="onFieldInput"
+            data-field="{{item.id}}"
+            placeholder="请输入"
+          />
+          
+          <textarea 
+            wx:elif="{{item.fieldType === 'textarea'}}" 
+            class="textarea" 
+            value="{{formData[item.id]}}"
+            bindinput="onFieldInput"
+            data-field="{{item.id}}"
+            placeholder="请输入"
+          />
+          
+          <input 
+            wx:elif="{{item.fieldType === 'number'}}" 
+            class="input" 
+            type="number"
+            value="{{formData[item.id]}}"
+            bindinput="onFieldInput"
+            data-field="{{item.id}}"
+            placeholder="请输入"
+          />
+          
+          <picker 
+            wx:elif="{{item.fieldType === 'date'}}" 
+            mode="date" 
+            bindchange="onFieldInput"
+            data-field="{{item.id}}"
+          >
+            <view class="input picker-view">
+              {{formData[item.id] || '选择日期'}}
+            </view>
+          </picker>
+          
+          <input 
+            wx:else 
+            class="input" 
+            value="{{formData[item.id]}}"
+            bindinput="onFieldInput"
+            data-field="{{item.id}}"
+            placeholder="请输入"
+          />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">备注</text>
+          <textarea 
+            class="textarea" 
+            value="{{formData._remark}}"
+            bindinput="onRemarkInput"
+            placeholder="请输入备注（选填）"
+          />
+        </view>
+      </view>
+      
+      <view class="form-footer">
+        <button bindtap="hideEditForm">取消</button>
+        <button type="primary" bindtap="submitEdit" loading="{{loading}}">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

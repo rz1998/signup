@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="login-header">
+    <view class="logo">报名项目</view>
+    <view class="subtitle">管理端登录</view>
+  </view>
+  
+  <view class="login-form">
+    <view class="form-item">
+      <view class="form-label">用户名</view>
+      <input 
+        class="form-input" 
+        type="text" 
+        placeholder="请输入用户名"
+        value="{{username}}"
+        bindinput="onUsernameInput"
+      />
+    </view>
+    
+    <view class="form-item">
+      <view class="form-label">密码</view>
+      <input 
+        class="form-input" 
+        password="true"
+        placeholder="请输入密码"
+        bindinput="onPasswordInput"
+      />
+    </view>
+    
+    <button 
+      class="login-btn" 
+      type="primary"
+      bindtap="handleLogin"
+      disabled="{{loading}}"
+    >
+      {{loading ? '登录中...' : '登录'}}
+    </button>
+  </view>
+  
+  <view class="login-footer">
+    <text bindtap="goBack">返回首页</text>
+  </view>
+</view>

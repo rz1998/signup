@@ -1,0 +1,134 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">员工管理</view>
+    <view class="add-btn" bindtap="showAddForm">
+      <text>+ 添加员工</text>
+    </view>
+  </view>
+
+  <!-- 筛选器 -->
+  <view class="filter-bar">
+    <picker mode="selector" range="{{companies}}" range-key="name" bindchange="onFilterCompanyChange">
+      <view class="filter-tag">{{filterCompanyLabel}}</view>
+    </picker>
+    <picker mode="selector" range="{{branches}}" range-key="name" bindchange="onFilterBranchChange">
+      <view class="filter-tag">{{filterBranchLabel}}</view>
+    </picker>
+  </view>
+
+  <view wx:if="{{loading && users.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{users.length === 0}}" class="empty">
+    <text>暂无用户</text>
+  </view>
+
+  <view wx:else class="user-list">
+    <view wx:for="{{users}}" wx:key="id" class="user-item">
+      <view class="user-info">
+        <view class="nickname">{{item.username}} <text class="role-tag">{{getRoleName(item.role)}}</text></view>
+        <view class="meta">
+          <text>姓名：{{item.fullName || '-'}}</text>
+          <text>手机：{{item.phone || '-'}}</text>
+        </view>
+        <view class="meta">
+          <text>公司：{{item.companyName || '-'}}</text>
+          <text>机构：{{item.branchName || '-'}}</text>
+        </view>
+        <view class="time">注册时间：{{item.createdAt}}</view>
+      </view>
+      <view class="actions">
+        <button size="mini" bindtap="showEditForm" data-user="{{item}}">编辑</button>
+        <button size="mini" type="warn" bindtap="deleteUser" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{!hasMore && users.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 用户表单弹窗 -->
+  <view wx:if="{{showForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{isEdit ? '编辑用户' : '添加用户'}}</view>
+        <view class="close" bindtap="hideForm">×</view>
+      </view>
+
+      <scroll-view scroll-y class="form-body">
+        <view class="form-item">
+          <text class="label">用户名 *</text>
+          <input class="input" value="{{formData.username}}" bindinput="onInput" data-field="username" placeholder="请输入用户名" disabled="{{isEdit}}" />
+        </view>
+
+        <view class="form-item" wx:if="{{!isEdit}}">
+          <text class="label">密码 *</text>
+          <input class="input" type="password" value="{{formData.password}}" bindinput="onInput" data-field="password" placeholder="请输入密码" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">姓名</text>
+          <input class="input" value="{{formData.fullName}}" bindinput="onInput" data-field="fullName" placeholder="请输入姓名" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">手机号</text>
+          <input class="input" value="{{formData.phone}}" bindinput="onInput" data-field="phone" placeholder="请输入手机号" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">邮箱</text>
+          <input class="input" value="{{formData.email}}" bindinput="onInput" data-field="email" placeholder="请输入邮箱" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">公司</text>
+          <picker mode="selector" range="{{formCompanies}}" range-key="name" bindchange="onFormCompanyChange">
+            <view class="picker-value">{{formCompanyLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="label">分支机构</text>
+          <picker mode="selector" range="{{formBranches}}" range-key="name" bindchange="onFormBranchChange">
+            <view class="picker-value">{{formBranchLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="label">角色</text>
+          <picker mode="selector" range="{{roles}}" range-key="label" bindchange="onRoleChange">
+            <view class="picker-value">{{roleLabel}}</view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="label">营销管理人员</text>
+          <picker mode="selector" range="{{formManagers}}" range-key="name" bindchange="onFormManagerChange">
+            <view class="picker-value">{{formManagerLabel}}</view>
+          </picker>
+          <text class="field-tip">仅普通营销人员需指定上级管理人员</text>
+        </view>
+
+        <view class="form-item">
+          <text class="label">状态</text>
+          <picker mode="selector" range="{{statuses}}" range-key="label" bindchange="onStatusChange">
+            <view class="picker-value">{{statusLabel}}</view>
+          </picker>
+        </view>
+      </scroll-view>
+
+      <view class="form-footer">
+        <button bindtap="hideForm">取消</button>
+        <button type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

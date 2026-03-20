@@ -1,0 +1,147 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">分享管理</view>
+    <view class="placeholder"></view>
+  </view>
+
+  <!-- Tab -->
+  <view class="tab-bar">
+    <view class="tab {{activeTab === 'generate' ? 'active' : ''}}" data-tab="generate" bindtap="switchTab">
+      生成分享
+    </view>
+    <view class="tab {{activeTab === 'records' ? 'active' : ''}}" data-tab="records" bindtap="switchTab">
+      分享记录
+    </view>
+  </view>
+
+  <!-- ========== 生成分享 ========== -->
+  <view wx:if="{{activeTab === 'generate'}}" class="tab-content">
+    <view class="section">
+      <view class="section-title">选择活动</view>
+      <view class="activity-selector" bindtap="showActivitySelector">
+        <text wx:if="{{selectedActivity}}" class="selected-activity">{{selectedActivity.name}}</text>
+        <text wx:else class="selector-placeholder">点击选择活动</text>
+        <text class="selector-arrow">›</text>
+      </view>
+    </view>
+
+    <view wx:if="{{selectedActivity}}" class="section">
+      <view class="section-title">分享方式</view>
+      <view class="share-actions">
+        <view class="share-action-item" bindtap="generateLinkShare">
+          <view class="action-icon">🔗</view>
+          <view class="action-label">生成分享链接</view>
+        </view>
+        <view class="share-action-item" bindtap="generateQRCode">
+          <view class="action-icon">📷</view>
+          <view class="action-label">生成二维码</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!selectedActivity}}" class="empty-tip">
+      <text>请先选择要分享的活动</text>
+    </view>
+  </view>
+
+  <!-- ========== 分享记录 ========== -->
+  <view wx:if="{{activeTab === 'records'}}" class="tab-content">
+    <view wx:if="{{recordsLoading && records.length === 0}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{records.length === 0}}" class="empty">
+      <text>暂无分享记录</text>
+    </view>
+
+    <view wx:else class="records-list">
+      <view wx:for="{{records}}" wx:key="id" class="record-item">
+        <view class="record-header">
+          <text class="record-activity">{{item.activityName}}</text>
+          <text class="record-type {{item.shareType === 'qrcode' ? 'type-qrcode' : 'type-link'}}">
+            {{item.shareType === 'qrcode' ? '二维码' : '链接'}}
+          </text>
+        </view>
+        <view class="record-url" wx:if="{{item.shareUrl}}">{{item.shareUrl}}</view>
+        <view class="record-footer">
+          <text class="record-visits">👁 {{item.visitCount}} 次访问</text>
+          <text class="record-time">{{item.createTime}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{recordsLoading}}" class="loading">
+        <text>加载中...</text>
+      </view>
+
+      <view wx:elif="{{!recordsHasMore && records.length > 0}}" class="no-more">
+        <text>没有更多了</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 活动选择弹窗 ========== -->
+  <view wx:if="{{showActivityPicker}}" class="form-mask">
+    <view class="picker-sheet">
+      <view class="sheet-header">
+        <view class="sheet-title">选择活动</view>
+        <view class="close" bindtap="hideActivitySelector">×</view>
+      </view>
+      <scroll-view scroll-y class="sheet-body">
+        <view wx:for="{{activities}}" wx:key="id" class="picker-item" data-index="{{index}}" bindtap="onActivitySelect">
+          <text>{{item.name}}</text>
+        </view>
+        <view wx:if="{{activities.length === 0}}" class="empty">
+          <text>暂无可选活动</text>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- ========== 分享链接弹窗 ========== -->
+  <view wx:if="{{showShareModal}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">分享链接</view>
+        <view class="close" bindtap="hideShareModal">×</view>
+      </view>
+      <view class="form-body">
+        <view class="share-info">
+          <text class="share-activity-name">{{shareData.activityTitle}}</text>
+        </view>
+        <view class="share-url-container">
+          <text class="share-url-label">分享链接</text>
+          <view class="share-url-box">{{shareData.shareUrl}}</view>
+        </view>
+        <view class="share-tip">点击下方按钮复制链接</view>
+      </view>
+      <view class="form-footer">
+        <button bindtap="hideShareModal">关闭</button>
+        <button type="primary" bindtap="copyShareLink">复制链接</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 二维码弹窗 ========== -->
+  <view wx:if="{{showQRCodeModal}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">分享二维码</view>
+        <view class="close" bindtap="hideQRCodeModal">×</view>
+      </view>
+      <view class="form-body">
+        <view class="share-info">
+          <text class="share-activity-name">{{shareData.activityTitle}}</text>
+        </view>
+        <view class="qrcode-container">
+          <image wx:if="{{shareData.qrCodeImage}}" src="{{shareData.qrCodeImage}}" mode="aspectFit" class="qrcode-image" />
+          <view wx:else class="qrcode-placeholder">二维码加载中...</view>
+        </view>
+      </view>
+      <view class="form-footer">
+        <button bindtap="hideQRCodeModal">关闭</button>
+        <button type="primary" bindtap="saveQRCodeImage">保存到相册</button>
+      </view>
+    </view>
+  </view>
+</view>

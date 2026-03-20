@@ -1,0 +1,55 @@
+<view class="container">
+  <!-- 顶部欢迎区域 -->
+  <view class="header">
+    <view class="welcome">欢迎来到报名项目</view>
+    <view class="subtitle">发现精彩活动，立即报名参与</view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="section">
+    <view class="section-title">最新活动</view>
+    
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+    
+    <view wx:elif="{{activities.length === 0}}" class="empty">
+      <text>暂无活动</text>
+    </view>
+    
+    <view wx:else class="activity-list">
+      <view 
+        wx:for="{{activities}}" 
+        wx:key="id" 
+        class="activity-card"
+        bindtap="goToActivity"
+        data-id="{{item.id}}"
+      >
+        <image 
+          class="activity-cover" 
+          src="{{item.coverImage || '/assets/images/default-cover.png'}}" 
+          mode="aspectFill"
+        />
+        <view class="activity-info">
+          <view class="activity-title">{{item.pageTitle || item.name}}</view>
+          <view class="activity-meta">
+            <text class="meta-item">📍 {{item.location || '待定'}}</text>
+            <text class="meta-item">👥 {{item.currentParticipants || 0}}/{{item.maxParticipants || 0}}</text>
+          </view>
+          <view class="activity-time">
+            <text>🕐 {{item.startDate}} - {{item.endDate}}</text>
+          </view>
+          <view class="activity-status status-{{item.status}}">
+            {{item.status === 'active' ? '报名中' : item.status === 'in_progress' ? '进行中' : item.status === 'completed' ? '已结束' : item.status === 'draft' ? '草稿' : '未知'}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员入口 -->
+  <view class="admin-entry" bindtap="goToAdmin">
+    <text>管理入口</text>
+    <text class="arrow">→</text>
+  </view>
+</view>

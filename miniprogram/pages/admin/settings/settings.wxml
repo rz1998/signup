@@ -1,0 +1,166 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">页面设置</view>
+  </view>
+
+  <view class="content">
+    <!-- 富文本编辑器区域 -->
+    <view class="editor-section">
+      <view class="editor-title">页面内容编辑</view>
+      
+      <!-- 标题输入 -->
+      <view class="editor-field">
+        <view class="field-label">页面标题</view>
+        <input class="title-input" value="{{settingsData.pageTitle}}" bindinput="onInput" data-field="pageTitle" placeholder="请输入页面标题" />
+      </view>
+      
+      <!-- 副标题输入 -->
+      <view class="editor-field">
+        <view class="field-label">副标题</view>
+        <input class="subtitle-input" value="{{settingsData.pageSubtitle}}" bindinput="onInput" data-field="pageSubtitle" placeholder="请输入副标题" />
+      </view>
+      
+      <!-- 富文本编辑器工具栏 -->
+      <view class="editor-toolbar">
+        <view class="toolbar-btn" bindtap="insertText" data-tag="加粗">B</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="斜体">I</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="链接">🔗</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="图片">🖼</view>
+        <view class="toolbar-sep"></view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="标题1">H1</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="标题2">H2</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="引用">❝</view>
+        <view class="toolbar-btn" bindtap="insertText" data-tag="列表">☰</view>
+      </view>
+      
+      <!-- 富文本内容区 -->
+      <view class="editor-content">
+        <textarea 
+          class="content-textarea" 
+          value="{{settingsData.pageDescription}}" 
+          bindinput="onInput" 
+          data-field="pageDescription"
+          placeholder="在此输入正文内容..."
+          maxlength="-1"
+        ></textarea>
+      </view>
+      
+      <!-- 字数统计 -->
+      <view class="word-count">字数：{{settingsData.pageDescription.length || 0}}</view>
+    </view>
+
+    <!-- 报名设置区域 -->
+    <view class="settings-section">
+      <view class="section-title">报名设置</view>
+      
+      <view class="setting-item">
+        <view class="setting-label">报名须知</view>
+        <textarea 
+          class="setting-textarea" 
+          value="{{settingsData.registrationNotice}}" 
+          bindinput="onInput" 
+          data-field="registrationNotice"
+          placeholder="请输入报名须知内容"
+        ></textarea>
+      </view>
+      
+      <view class="setting-item">
+        <view class="setting-label">联系电话</view>
+        <input class="setting-input" value="{{settingsData.contactPhone}}" bindinput="onInput" data-field="contactPhone" placeholder="请输入联系电话" />
+      </view>
+      
+      <view class="setting-item">
+        <view class="setting-label">联系邮箱</view>
+        <input class="setting-input" value="{{settingsData.contactEmail}}" bindinput="onInput" data-field="contactEmail" placeholder="请输入联系邮箱" />
+      </view>
+    </view>
+
+    <!-- 报名表单字段管理（仅活动设置显示） -->
+    <view class="settings-section" wx:if="{{activityId}}">
+      <view class="section-title-row">
+        <view class="section-title">报名表单字段</view>
+        <view class="toggle-btn" bindtap="toggleFormFields">
+          {{showFormFields ? '收起' : '展开'}}
+        </view>
+      </view>
+      
+      <view wx:if="{{showFormFields}}">
+        <view class="field-list">
+          <view wx:for="{{formFields}}" wx:key="id" class="field-item">
+            <view class="field-info">
+              <view class="field-name">{{item.fieldName}}</view>
+              <view class="field-meta">
+                <text class="field-type">{{getFieldTypeLabel(item.fieldType)}}</text>
+                <text class="field-required" wx:if="{{item.isRequired}}">*必填</text>
+              </view>
+            </view>
+            <view class="field-actions">
+              <text class="action-btn" bindtap="moveField" data-id="{{item.id}}" data-direction="up">↑</text>
+              <text class="action-btn" bindtap="moveField" data-id="{{item.id}}" data-direction="down">↓</text>
+              <text class="action-btn edit" bindtap="showEditFieldForm" data-field="{{item}}">编辑</text>
+              <text class="action-btn delete" bindtap="deleteField" data-id="{{item.id}}">删除</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{formFields.length === 0}}" class="empty-fields">
+            暂无自定义字段，默认只收集手机号
+          </view>
+        </view>
+        
+        <view class="add-field-btn" bindtap="showAddFieldForm">
+          + 添加字段
+        </view>
+      </view>
+    </view>
+
+    <view class="btn-save">
+      <button type="primary" bindtap="saveSettings" loading="{{loading}}">保存设置</button>
+    </view>
+  </view>
+
+  <!-- 字段编辑弹窗 -->
+  <view wx:if="{{showFieldForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{editingField ? '编辑字段' : '添加字段'}}</view>
+        <view class="close" bindtap="hideFieldForm">×</view>
+      </view>
+      
+      <view class="form-body">
+        <view class="form-item">
+          <text class="label">字段名称 *</text>
+          <input class="input" value="{{fieldFormData.fieldName}}" bindinput="onFieldInput" data-field="fieldName" placeholder="如：姓名、公司、职位" />
+        </view>
+        
+        <view class="form-item">
+          <text class="label">字段类型</text>
+          <picker mode="selector" range="{{fieldTypes}}" range-key="label" bindchange="onFieldTypeChange">
+            <view class="picker-value">{{fieldTypeLabel}}</view>
+          </picker>
+        </view>
+        
+        <!-- 选项配置（仅单选/多选/下拉显示） -->
+        <view class="form-item" wx:if="{{fieldFormData.fieldType === 'radio' || fieldFormData.fieldType === 'checkbox' || fieldFormData.fieldType === 'select'}}">
+          <text class="label">选项内容 *</text>
+          <textarea class="textarea" value="{{fieldFormData.options}}" bindinput="onFieldInput" data-field="options" placeholder="每行一个选项，如：选项1/选项2/选项3" />
+          <text class="field-tip">每行一个选项</text>
+        </view>
+        
+        <view class="form-item">
+          <checkbox-group bindchange="onFieldRequiredChange">
+            <label class="checkbox-label">
+              <checkbox value="1" checked="{{fieldFormData.isRequired}}" />
+              <text>必填字段</text>
+            </label>
+          </checkbox-group>
+        </view>
+      </view>
+      
+      <view class="form-footer">
+        <button bindtap="hideFieldForm">取消</button>
+        <button type="primary" bindtap="saveField">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

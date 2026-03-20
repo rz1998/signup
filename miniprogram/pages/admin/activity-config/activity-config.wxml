@@ -1,0 +1,191 @@
+<view class="container">
+  <view class="header">
+    <view class="back" bindtap="goBack">← 返回</view>
+    <view class="title">活动配置</view>
+    <view class="placeholder"></view>
+  </view>
+
+  <!-- 活动标题 -->
+  <view class="activity-info">
+    <text class="activity-name">{{activityTitle}}</text>
+  </view>
+
+  <!-- Tab切换 -->
+  <view class="tab-bar">
+    <view class="tab {{activeTab === 'fields' ? 'active' : ''}}" data-tab="fields" bindtap="switchTab">
+      表单字段
+    </view>
+    <view class="tab {{activeTab === 'style' ? 'active' : ''}}" data-tab="style" bindtap="switchTab">
+      页面样式
+    </view>
+  </view>
+
+  <!-- ========== 表单字段 ========== -->
+  <view wx:if="{{activeTab === 'fields'}}" class="tab-content">
+    <view class="section-header">
+      <text class="section-title">字段列表</text>
+      <view class="add-btn" bindtap="showAddField">+ 添加字段</view>
+    </view>
+
+    <view wx:if="{{loading && fields.length === 0}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:elif="{{fields.length === 0}}" class="empty">
+      <text>暂无自定义字段</text>
+      <text class="empty-tip">点击上方「添加字段」创建</text>
+    </view>
+
+    <view wx:else class="field-list">
+      <view wx:for="{{fields}}" wx:key="id" class="field-item">
+        <view class="field-drag">
+          <text class="drag-icon">☰</text>
+        </view>
+        <view class="field-content">
+          <view class="field-label">{{item.label}}</view>
+          <view class="field-meta">
+            <text class="field-name">{{item.name}}</text>
+            <text class="field-type">{{getFieldTypeLabel(item.type)}}</text>
+            <text wx:if="{{item.required}}" class="field-required">必填</text>
+          </view>
+          <view wx:if="{{item.placeholder}}" class="field-placeholder">提示：{{item.placeholder}}</view>
+        </view>
+        <view class="field-actions">
+          <view class="action-up {{index === 0 ? 'disabled' : ''}}" data-index="{{index}}" catchtap="moveFieldUp">↑</view>
+          <view class="action-down {{index === fields.length - 1 ? 'disabled' : ''}}" data-index="{{index}}" catchtap="moveFieldDown">↓</view>
+          <view class="action-edit" data-field="{{item}}" catchtap="showEditField">编辑</view>
+          <view class="action-delete" data-field="{{item}}" catchtap="deleteField">删除</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 页面样式 ========== -->
+  <view wx:if="{{activeTab === 'style'}}" class="tab-content">
+    <view class="section-header">
+      <text class="section-title">页面样式配置</text>
+      <view class="add-btn" bindtap="showStyleConfig">编辑</view>
+    </view>
+
+    <view class="style-preview">
+      <image class="preview-cover" src="{{styleData.coverImage || '/assets/images/default-cover.png'}}" mode="aspectFill" />
+      <view class="preview-title">{{styleData.pageTitle || activityTitle}}</view>
+      <view class="preview-subtitle">{{styleData.pageSubtitle || '副标题未设置'}}</view>
+    </view>
+
+    <view class="style-info">
+      <view class="style-item">
+        <text class="style-label">页面标题</text>
+        <text class="style-value">{{styleData.pageTitle || '(未设置)'}}</text>
+      </view>
+      <view class="style-item">
+        <text class="style-label">页面副标题</text>
+        <text class="style-value">{{styleData.pageSubtitle || '(未设置)'}}</text>
+      </view>
+      <view class="style-item">
+        <text class="style-label">背景色</text>
+        <text class="style-value">{{styleData.backgroundColor}}</text>
+        <view class="color-swatch" style="background:{{styleData.backgroundColor}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 字段表单弹窗 ========== -->
+  <view wx:if="{{showFieldForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">{{isEditField ? '编辑字段' : '添加字段'}}</view>
+        <view class="close" bindtap="hideFieldForm">×</view>
+      </view>
+
+      <scroll-view scroll-y class="form-body">
+        <view class="form-item">
+          <text class="label">字段标签 *</text>
+          <input class="input" value="{{fieldFormData.label}}" data-field="label" bindinput="onFieldFormInput" placeholder="显示在表单上的名称，如「姓名」" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">字段名称 *</text>
+          <input class="input" value="{{fieldFormData.name}}" data-field="name" bindinput="onFieldFormInput" placeholder="英文标识，用于数据存储，如 name" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">字段类型</text>
+          <picker mode="selector" range="{{fieldTypes}}" range-key="label" bindchange="onFieldTypeChange">
+            <view class="picker-value">
+              {{selectedFieldTypeLabel}}
+            </view>
+          </picker>
+        </view>
+
+        <view class="form-item">
+          <text class="label">占位提示</text>
+          <input class="input" value="{{fieldFormData.placeholder}}" data-field="placeholder" bindinput="onFieldFormInput" placeholder="输入框提示文字" />
+        </view>
+
+        <view wx:if="{{fieldFormData.type === 'select' || fieldFormData.type === 'multi_select'}}" class="form-item">
+          <text class="label">选项（每行一个）</text>
+          <textarea class="textarea" value="{{fieldFormData.options}}" data-field="options" bindinput="onFieldFormInput" placeholder="选项1&#10;选项2&#10;选项3" />
+        </view>
+
+        <view class="form-item form-item-switch">
+          <text class="label">必填</text>
+          <switch checked="{{fieldFormData.required}}" bindchange="onFieldRequiredChange" color="#1890ff" />
+        </view>
+      </scroll-view>
+
+      <view class="form-footer">
+        <button bindtap="hideFieldForm">取消</button>
+        <button type="primary" bindtap="submitFieldForm">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== 样式配置弹窗 ========== -->
+  <view wx:if="{{showStyleForm}}" class="form-mask">
+    <view class="form-container">
+      <view class="form-header">
+        <view class="form-title">页面样式配置</view>
+        <view class="close" bindtap="hideStyleForm">×</view>
+      </view>
+
+      <scroll-view scroll-y class="form-body">
+        <view class="form-item">
+          <text class="label">页面标题</text>
+          <input class="input" value="{{styleData.pageTitle}}" data-field="pageTitle" bindinput="onStyleInput" placeholder="留空使用活动名称" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">页面副标题</text>
+          <input class="input" value="{{styleData.pageSubtitle}}" data-field="pageSubtitle" bindinput="onStyleInput" placeholder="留空使用默认副标题" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">页面描述</text>
+          <textarea class="textarea" value="{{styleData.pageDescription}}" data-field="pageDescription" bindinput="onStyleInput" placeholder="活动详情描述" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">封面图</text>
+          <view class="cover-uploader" bindtap="chooseCoverImage">
+            <image wx:if="{{styleData.coverImage}}" src="{{styleData.coverImage}}" mode="aspectFill" class="cover-preview" />
+            <view wx:else class="cover-placeholder">
+              <text>+</text>
+              <text class="cover-tip">点击上传封面图</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <text class="label">背景色</text>
+          <input class="input" value="{{styleData.backgroundColor}}" data-field="backgroundColor" bindinput="onStyleInput" placeholder="#f5f5f5" />
+        </view>
+      </scroll-view>
+
+      <view class="form-footer">
+        <button bindtap="hideStyleForm">取消</button>
+        <button type="primary" bindtap="saveStyleConfig">保存</button>
+      </view>
+    </view>
+  </view>
+</view>
