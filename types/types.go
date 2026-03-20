@@ -68,6 +68,7 @@ type BranchInfo struct {
 	Name        string `json:"name"`
 	LeaderName  string `json:"leaderName"`
 	LeaderPhone string `json:"leaderPhone"`
+	LeaderID    string `json:"leaderId"`
 	Status      string `json:"status"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
@@ -78,6 +79,7 @@ type CreateBranchReq struct {
 	Name        string `json:"name"`
 	LeaderName  string `json:"leaderName,optional"`
 	LeaderPhone string `json:"leaderPhone,optional"`
+	LeaderID    string `json:"leaderId,optional"`
 	Status     string `json:"status,default=active"`
 }
 
@@ -85,6 +87,7 @@ type UpdateBranchReq struct {
 	Name        string `json:"name,optional"`
 	LeaderName  string `json:"leaderName,optional"`
 	LeaderPhone string `json:"leaderPhone,optional"`
+	LeaderID    string `json:"leaderId,optional"`
 	Status     string `json:"status,optional"`
 }
 

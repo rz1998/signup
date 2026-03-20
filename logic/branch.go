@@ -40,6 +40,7 @@ type BranchWithCompany struct {
 	Name        string `json:"name"`
 	LeaderName  string `json:"leaderName"`
 	LeaderPhone string `json:"leaderPhone"`
+	LeaderID    string `json:"leaderId"`
 	Status      string `json:"status"`
 	CreatedAt   string `json:"createdAt"`
 	UpdatedAt   string `json:"updatedAt"`
@@ -80,7 +81,7 @@ func (l *GetBranchListLogic) GetBranchList(req *GetBranchListReq) (map[string]in
 
 	// Query list
 	query := fmt.Sprintf(`
-		SELECT b.id, b.company_id, b.name, b.leader_name, b.leader_phone, b.status, b.created_at, b.updated_at,
+		SELECT b.id, b.company_id, b.name, b.leader_name, b.leader_phone, b.leader_id, b.status, b.created_at, b.updated_at,
 		       c.name as company_name
 		FROM branches b
 		LEFT JOIN companies c ON b.company_id = c.id
@@ -99,10 +100,11 @@ func (l *GetBranchListLogic) GetBranchList(req *GetBranchListReq) (map[string]in
 	var branches []BranchWithCompany
 	for rows.Next() {
 		var branch BranchWithCompany
-		var leaderName, leaderPhone, companyName sql.NullString
-		if err := rows.Scan(&branch.ID, &branch.CompanyID, &branch.Name, &leaderName, &leaderPhone, &branch.Status, &branch.CreatedAt, &branch.UpdatedAt, &companyName); err == nil {
+		var leaderName, leaderPhone, leaderID, companyName sql.NullString
+		if err := rows.Scan(&branch.ID, &branch.CompanyID, &branch.Name, &leaderName, &leaderPhone, &leaderID, &branch.Status, &branch.CreatedAt, &branch.UpdatedAt, &companyName); err == nil {
 			branch.LeaderName = leaderName.String
 			branch.LeaderPhone = leaderPhone.String
+			branch.LeaderID = leaderID.String
 			branch.CompanyName = companyName.String
 			branches = append(branches, branch)
 		}
@@ -133,16 +135,17 @@ func NewGetBranchLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetBran
 
 func (l *GetBranchLogic) GetBranch(id string) (*types.BranchInfo, error) {
 	var branch types.BranchInfo
-	var leaderName, leaderPhone sql.NullString
+	var leaderName, leaderPhone, leaderID sql.NullString
 	err := l.svcCtx.DB.QueryRow(`
-		SELECT id, company_id, name, leader_name, leader_phone, status, created_at, updated_at
+		SELECT id, company_id, name, leader_name, leader_phone, leader_id, status, created_at, updated_at
 		FROM branches WHERE id = $1 AND deleted_at IS NULL
-	`, id).Scan(&branch.ID, &branch.CompanyID, &branch.Name, &leaderName, &leaderPhone, &branch.Status, &branch.CreatedAt, &branch.UpdatedAt)
+	`, id).Scan(&branch.ID, &branch.CompanyID, &branch.Name, &leaderName, &leaderPhone, &leaderID, &branch.Status, &branch.CreatedAt, &branch.UpdatedAt)
 	if err != nil {
 		return nil, errors.New("分支机构不存在")
 	}
 	branch.LeaderName = leaderName.String
 	branch.LeaderPhone = leaderPhone.String
+	branch.LeaderID = leaderID.String
 	return &branch, nil
 }
 
@@ -179,9 +182,9 @@ func (l *CreateBranchLogic) CreateBranch(req *types.CreateBranchReq) (*types.Bra
 	}
 
 	_, err := l.svcCtx.DB.Exec(`
-		INSERT INTO branches (id, company_id, name, leader_name, leader_phone, status, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`, id, req.CompanyID, req.Name, req.LeaderName, req.LeaderPhone, req.Status)
+		INSERT INTO branches (id, company_id, name, leader_name, leader_phone, leader_id, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`, id, req.CompanyID, req.Name, req.LeaderName, req.LeaderPhone, req.LeaderID, req.Status)
 	if err != nil {
 		return nil, errors.New("创建分支机构失败: " + err.Error())
 	}
@@ -192,6 +195,7 @@ func (l *CreateBranchLogic) CreateBranch(req *types.CreateBranchReq) (*types.Bra
 		Name:        req.Name,
 		LeaderName:  req.LeaderName,
 		LeaderPhone: req.LeaderPhone,
+		LeaderID:    req.LeaderID,
 		Status:      req.Status,
 		CreatedAt:   time.Now().Format("2006-01-02T15:04:05Z"),
 		UpdatedAt:   time.Now().Format("2006-01-02T15:04:05Z"),
@@ -228,6 +232,11 @@ func (l *UpdateBranchLogic) UpdateBranch(id string, req *types.UpdateBranchReq) 
 	if req.LeaderPhone != "" {
 		setClauses = append(setClauses, fmt.Sprintf("leader_phone = $%d", argNum))
 		args = append(args, req.LeaderPhone)
+		argNum++
+	}
+	if req.LeaderID != "" {
+		setClauses = append(setClauses, fmt.Sprintf("leader_id = $%d", argNum))
+		args = append(args, req.LeaderID)
 		argNum++
 	}
 	if req.Status != "" {

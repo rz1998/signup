@@ -78,13 +78,15 @@
         </view>
 
         <view class="form-item">
-          <text class="label">负责人姓名</text>
-          <input class="input" value="{{formData.leaderName}}" bindinput="onInput" data-field="leaderName" placeholder="请输入负责人姓名" />
-        </view>
-
-        <view class="form-item">
-          <text class="label">负责人电话</text>
-          <input class="input" value="{{formData.leaderPhone}}" bindinput="onInput" data-field="leaderPhone" placeholder="请输入负责人电话" />
+          <text class="label">负责人 *</text>
+          <view class="leader-selector">
+            <view class="leader-selected" wx:if="{{selectedUser}}" bindtap="showUserSelector">
+              <text class="leader-name">{{selectedUser.name}}</text>
+              <text class="leader-phone">{{selectedUser.phone}}</text>
+            </view>
+            <button wx:else size="mini" type="primary" bindtap="showUserSelector">选择负责人</button>
+            <button wx:if="{{selectedUser}}" size="mini" bindtap="clearSelectedUser">清除</button>
+          </view>
         </view>
 
         <view class="form-item" wx:if="{{isEdit}}">
@@ -98,6 +100,58 @@
       <view class="form-footer">
         <button bindtap="hideForm">取消</button>
         <button type="primary" bindtap="submitForm">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户选择弹窗 -->
+  <view wx:if="{{showUserPicker}}" class="form-mask">
+    <view class="form-container user-picker-container">
+      <view class="form-header">
+        <view class="form-title">选择负责人</view>
+        <view class="close" bindtap="hideUserPicker">×</view>
+      </view>
+
+      <view class="user-picker-toolbar">
+        <input class="search-input" placeholder="搜索用户姓名或电话" bindinput="onUserSearch" value="{{userSearchKey}}" />
+        <button size="mini" type="primary" bindtap="showQuickAddUser">新增用户</button>
+      </view>
+
+      <view class="user-list">
+        <view wx:for="{{filteredUserList}}" wx:key="id" class="user-item {{item.id === selectedUserId ? 'selected' : ''}}" bindtap="selectUser" data-user="{{item}}">
+          <view class="user-info">
+            <text class="user-name">{{item.name}}</text>
+            <text class="user-phone">{{item.phone}}</text>
+          </view>
+          <view class="user-role">
+            <text class="role-badge">{{item.role === 'branch_admin' ? '机构管理员' : item.role}}</text>
+          </view>
+          <view wx:if="{{item.id === selectedUserId}}" class="check-icon">✓</view>
+        </view>
+        <view wx:if="{{filteredUserList.length === 0}}" class="empty">
+          <text>暂无用户</text>
+        </view>
+      </view>
+
+      <!-- 快速新增用户表单 -->
+      <view wx:if="{{showQuickAddUser}}" class="quick-add-form">
+        <view class="quick-add-title">新增用户（设为机构管理员）</view>
+        <view class="form-item">
+          <text class="label">姓名 *</text>
+          <input class="input" value="{{quickAddData.name}}" bindinput="onQuickAddInput" data-field="name" placeholder="请输入姓名" />
+        </view>
+        <view class="form-item">
+          <text class="label">电话 *</text>
+          <input class="input" value="{{quickAddData.phone}}" bindinput="onQuickAddInput" data-field="phone" placeholder="请输入电话" />
+        </view>
+        <view class="form-item">
+          <text class="label">密码 *</text>
+          <input class="input" type="password" value="{{quickAddData.password}}" bindinput="onQuickAddInput" data-field="password" placeholder="请输入密码" />
+        </view>
+        <view class="form-footer">
+          <button bindtap="cancelQuickAddUser">取消</button>
+          <button type="primary" bindtap="confirmQuickAddUser">确认添加</button>
+        </view>
       </view>
     </view>
   </view>

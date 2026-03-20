@@ -1,4 +1,4 @@
-import { branchApi, companyApi } from '../../../utils/request'
+import { branchApi, companyApi, userApi } from '../../../utils/request'
 
 Page({
   data: {
@@ -25,7 +25,17 @@ Page({
     statuses: [
       { label: '正常', value: 'active' },
       { label: '禁用', value: 'inactive' }
-    ]
+    ],
+    // User picker
+    showUserPicker: false,
+    userList: [],
+    filteredUserList: [],
+    selectedUserId: '',
+    selectedUser: null,
+    userSearchKey: '',
+    // Quick add user
+    showQuickAddUser: false,
+    quickAddData: {}
   },
 
   onLoad() {
@@ -111,7 +121,11 @@ Page({
       formCompanyIndex: 0,
       formCompanyLabel: '请选择所属公司',
       statusIndex: 0,
-      statusLabel: '正常'
+      statusLabel: '正常',
+      selectedUserId: '',
+      selectedUser: null,
+      showQuickAddUser: false,
+      quickAddData: {}
     })
   },
 
@@ -137,8 +151,6 @@ Page({
       formData: {
         id: branch.id,
         name: branch.name || '',
-        leaderName: branch.leaderName || '',
-        leaderPhone: branch.leaderPhone || '',
         description: branch.description || ''
       },
       isEdit: true,
@@ -146,7 +158,11 @@ Page({
       formCompanyIndex,
       formCompanyLabel,
       statusIndex,
-      statusLabel: branch.status === 'inactive' ? '禁用' : '正常'
+      statusLabel: branch.status === 'inactive' ? '禁用' : '正常',
+      selectedUserId: branch.leaderId || '',
+      selectedUser: branch.leaderId ? { id: branch.leaderId, name: branch.leaderName, phone: branch.leaderPhone } : null,
+      showQuickAddUser: false,
+      quickAddData: {}
     })
   },
 
@@ -181,7 +197,7 @@ Page({
   },
 
   async submitForm() {
-    const { formData, isEdit } = this.data
+    const { formData, isEdit, selectedUserId } = this.data
     if (!formData.name) {
       wx.showToast({ title: '请输入分支机构名称', icon: 'none' })
       return
@@ -194,8 +210,7 @@ Page({
     const submitData = {
       name: formData.name,
       companyId: formData.companyId,
-      leaderName: formData.leaderName || '',
-      leaderPhone: formData.leaderPhone || '',
+      leaderId: selectedUserId || '',
       description: formData.description || '',
       status: formData.status || 'active'
     }
@@ -242,5 +257,122 @@ Page({
 
   goBack() {
     wx.navigateBack()
+  },
+
+  // 用户选择相关
+  async loadUsers() {
+    try {
+      const res = await userApi.list(1, 100, { role: 'branch_admin' })
+      if (res.success && res.data) {
+        const list = res.data.users || []
+        this.setData({
+          userList: list,
+          filteredUserList: list
+        })
+      }
+    } catch (error) {
+      console.error('加载用户列表失败:', error)
+    }
+  },
+
+  showUserSelector() {
+    this.loadUsers()
+    this.setData({
+      showUserPicker: true,
+      userSearchKey: '',
+      filteredUserList: this.data.userList
+    })
+  },
+
+  hideUserPicker() {
+    this.setData({ showUserPicker: false, showQuickAddUser: false, quickAddData: {} })
+  },
+
+  onUserSearch(e) {
+    const key = e.detail.value.toLowerCase()
+    const { userList } = this.data
+    const filtered = userList.filter(user =>
+      !key || (user.name && user.name.toLowerCase().includes(key)) ||
+        (user.phone && user.phone.includes(key))
+    )
+    this.setData({
+      userSearchKey: key,
+      filteredUserList: filtered
+    })
+  },
+
+  selectUser(e) {
+    const user = e.currentTarget.dataset.user
+    this.setData({
+      selectedUserId: user.id,
+      selectedUser: user,
+      showUserPicker: false
+    })
+  },
+
+  clearSelectedUser() {
+    this.setData({
+      selectedUserId: '',
+      selectedUser: null
+    })
+  },
+
+  showQuickAddUser() {
+    this.setData({
+      showQuickAddUser: true,
+      quickAddData: {}
+    })
+  },
+
+  cancelQuickAddUser() {
+    this.setData({ showQuickAddUser: false, quickAddData: {} })
+  },
+
+  onQuickAddInput(e) {
+    const field = e.currentTarget.dataset.field
+    const value = e.detail.value
+    this.setData({ [`quickAddData.${field}`]: value })
+  },
+
+  async confirmQuickAddUser() {
+    const { quickAddData } = this.data
+    if (!quickAddData.name) {
+      wx.showToast({ title: '请输入姓名', icon: 'none' })
+      return
+    }
+    if (!quickAddData.phone) {
+      wx.showToast({ title: '请输入电话', icon: 'none' })
+      return
+    }
+    if (!quickAddData.password) {
+      wx.showToast({ title: '请输入密码', icon: 'none' })
+      return
+    }
+
+    try {
+      const res = await userApi.create({
+        name: quickAddData.name,
+        phone: quickAddData.phone,
+        password: quickAddData.password,
+        role: 'branch_admin'
+      })
+      if (res.success && res.data) {
+        wx.showToast({ title: '创建成功', icon: 'success' })
+        const newUser = res.data
+        this.setData({
+          showQuickAddUser: false,
+          quickAddData: {},
+          selectedUserId: newUser.id,
+          selectedUser: newUser
+        })
+        this.loadUsers()
+        this.setData({ showUserPicker: false })
+      } else {
+        wx.showToast({ title: res.message || '创建失败', icon: 'none' })
+      }
+    } catch (error) {
+      console.error('创建用户失败:', error)
+      wx.showToast({ title: '创建失败', icon: 'none' })
+    }
   }
 })
