@@ -1,0 +1,61 @@
+<view class="container">
+  <!-- 成功图标 -->
+  <view class="success-header">
+    <view class="success-icon">
+      <view class="icon-circle">
+        <view class="icon-check"></view>
+      </view>
+    </view>
+    <view class="success-title">报名提交成功</view>
+    <view class="success-subtitle">感谢您的报名，我们将在审核后尽快与您联系</view>
+  </view>
+
+  <!-- 报名信息摘要 -->
+  <view class="info-card" wx:if="{{registration}}">
+    <view class="card-title">报名信息</view>
+    
+    <view class="info-row">
+      <text class="label">活动名称</text>
+      <text class="value">{{registration.activityName || registration.activity?.name || '未知活动'}}</text>
+    </view>
+    
+    <view class="info-row" wx:if="{{registration.formData}}">
+      <text class="label">姓名</text>
+      <text class="value">{{registration.formData['姓名'] || registration.formData['field_name_1'] || '-'}}</text>
+    </view>
+    
+    <view class="info-row" wx:if="{{registration.phone}}">
+      <text class="label">手机号</text>
+      <text class="value">{{registration.phone}}</text>
+    </view>
+    
+    <view class="info-row">
+      <text class="label">报名时间</text>
+      <text class="value">{{registration.createdAt || formattedTime}}</text>
+    </view>
+    
+    <view class="info-row">
+      <text class="label">当前状态</text>
+      <text class="value status-text status-{{registration.status}}">{{statusText}}</text>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="tips-card">
+    <view class="tips-title">温馨提示</view>
+    <view class="tips-item" wx:for="{{tips}}" wx:key="index">
+      <text class="tips-bullet">•</text>
+      <text class="tips-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="btn-primary" bindtap="goToMyRegistration" hover-class="btn-hover">
+      查看我的报名
+    </button>
+    <button class="btn-secondary" bindtap="goBackToActivity" hover-class="btn-hover">
+      返回活动列表
+    </button>
+  </view>
+</view>

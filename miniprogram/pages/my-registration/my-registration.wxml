@@ -77,7 +77,7 @@
             wx:if="{{item.status === 'pending'}}"
             class="btn-edit" 
             size="mini" 
-            bindtap="showEditForm"
+            bindtap="goToEditPage"
             data-reg="{{item}}"
           >
             修改报名
@@ -92,86 +92,6 @@
             取消报名
           </button>
         </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 修改报名弹窗 -->
-  <view wx:if="{{showEditForm}}" class="form-mask">
-    <view class="form-container">
-      <view class="form-header">
-        <view class="form-title">修改报名</view>
-        <view class="close" bindtap="hideEditForm">×</view>
-      </view>
-      
-      <view class="form-body">
-        <!-- 动态表单字段 -->
-        <view wx:for="{{formFields}}" wx:key="id" class="form-item">
-          <text class="label">{{item.fieldName}}{{item.isRequired ? ' *' : ''}}</text>
-          
-          <input 
-            wx:if="{{item.fieldType === 'text' || item.fieldType === 'tel' || item.fieldType === 'email'}}" 
-            class="input" 
-            value="{{formData[item.id]}}"
-            bindinput="onFieldInput"
-            data-field="{{item.id}}"
-            placeholder="请输入"
-          />
-          
-          <textarea 
-            wx:elif="{{item.fieldType === 'textarea'}}" 
-            class="textarea" 
-            value="{{formData[item.id]}}"
-            bindinput="onFieldInput"
-            data-field="{{item.id}}"
-            placeholder="请输入"
-          />
-          
-          <input 
-            wx:elif="{{item.fieldType === 'number'}}" 
-            class="input" 
-            type="number"
-            value="{{formData[item.id]}}"
-            bindinput="onFieldInput"
-            data-field="{{item.id}}"
-            placeholder="请输入"
-          />
-          
-          <picker 
-            wx:elif="{{item.fieldType === 'date'}}" 
-            mode="date" 
-            bindchange="onFieldInput"
-            data-field="{{item.id}}"
-          >
-            <view class="input picker-view">
-              {{formData[item.id] || '选择日期'}}
-            </view>
-          </picker>
-          
-          <input 
-            wx:else 
-            class="input" 
-            value="{{formData[item.id]}}"
-            bindinput="onFieldInput"
-            data-field="{{item.id}}"
-            placeholder="请输入"
-          />
-        </view>
-        
-        <view class="form-item">
-          <text class="label">备注</text>
-          <textarea 
-            class="textarea" 
-            value="{{formData._remark}}"
-            bindinput="onRemarkInput"
-            placeholder="请输入备注（选填）"
-          />
-        </view>
-      </view>
-      
-      <view class="form-footer">
-        <button bindtap="hideEditForm">取消</button>
-        <button type="primary" bindtap="submitEdit" loading="{{loading}}">保存</button>
       </view>
     </view>
   </view>

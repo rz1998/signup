@@ -271,8 +271,10 @@ Page({
           icon: 'success'
         })
         setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/my-registration/my-registration'
+          const registrationId = res.data?.id || ''
+          const activityName = encodeURIComponent(activity.name || '')
+          wx.redirectTo({
+            url: `/pages/visitor/success/success?registrationId=${registrationId}&activityName=${activityName}`
           })
         }, 1500)
       }

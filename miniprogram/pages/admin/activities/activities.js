@@ -463,6 +463,13 @@ Page({
     })
   },
 
+  goToConfig(e) {
+    const activity = e.currentTarget.dataset.activity
+    wx.navigateTo({
+      url: `/pages/admin/activity-config/activity-config?activityId=${activity.id}&activityTitle=${encodeURIComponent(activity.pageTitle || activity.name)}`
+    })
+  },
+
   goToDetail(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({

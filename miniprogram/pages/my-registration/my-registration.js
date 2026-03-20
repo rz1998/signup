@@ -1,15 +1,11 @@
-import { registrationApi, activityApi, formFieldApi } from '../../utils/request'
+import { registrationApi } from '../../utils/request'
 
 Page({
   data: {
     registrations: [],
     loading: false,
     showPhoneSearch: true,
-    phone: '',
-    showEditForm: false,
-    editingRegistration: null,
-    formData: {},
-    formFields: []
+    phone: ''
   },
 
   onLoad() {
@@ -98,7 +94,7 @@ Page({
     })
   },
 
-  async showEditForm(e) {
+  goToEditPage(e) {
     const reg = e.currentTarget.dataset.reg
     if (reg.status !== 'pending') {
       wx.showToast({
@@ -107,112 +103,35 @@ Page({
       })
       return
     }
-
-    // 加载表单字段
-    try {
-      const fieldsRes = await formFieldApi.list(reg.activityId)
-      let formFields = []
-      if (fieldsRes.success && fieldsRes.data) {
-        formFields = fieldsRes.data.fields || []
-        formFields.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-      }
-
-      // 解析已有数据
-      const formData = reg.formData || {}
-      formData._remark = reg.remark || ''
-
-      this.setData({
-        showEditForm: true,
-        editingRegistration: reg,
-        formFields,
-        formData
-      })
-    } catch (error) {
-      console.error('加载表单字段失败:', error)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none'
-      })
-    }
-  },
-
-  hideEditForm() {
-    this.setData({
-      showEditForm: false,
-      editingRegistration: null,
-      formFields: [],
-      formData: {}
+    wx.navigateTo({
+      url: `/pages/visitor/edit/edit?registrationId=${reg.id}`
     })
   },
 
-  onFieldInput(e) {
-    const field = e.currentTarget.dataset.field
-    const value = e.detail.value
-    const { formData } = this.data
-    formData[field] = value
-    this.setData({ formData })
-  },
-
-  onRemarkInput(e) {
-    const { formData } = this.data
-    formData._remark = e.detail.value
-    this.setData({ formData })
-  },
-
-  async submitEdit() {
-    const { editingRegistration, formData, formFields, phone } = this.data
-
-    // 验证必填字段
-    for (const field of formFields) {
-      if (field.isRequired && !formData[field.id]) {
-        wx.showToast({
-          title: `请填写${field.fieldName}`,
-          icon: 'none'
-        })
-        return
+  async cancelRegistration(e) {
+    const id = e.currentTarget.dataset.id
+    wx.showModal({
+      title: '确认取消',
+      content: '确定要取消该报名吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await registrationApi.cancel(id)
+            wx.showToast({
+              title: '已取消',
+              icon: 'success'
+            })
+            this.loadRegistrations(this.data.phone)
+          } catch (error) {
+            console.error('取消报名失败:', error)
+            wx.showToast({
+              title: '取消失败',
+              icon: 'none'
+            })
+          }
+        }
       }
-    }
-
-    this.setData({ loading: true })
-    try {
-      // 构建提交数据
-      const submitData = {
-        phone: phone
-      }
-
-      // 添加表单字段数据
-      const extraFields = {}
-      for (const field of formFields) {
-        extraFields[`field_${field.id}`] = formData[field.id] || ''
-        extraFields[`field_${field.id}_name`] = field.fieldName
-        extraFields[`field_${field.id}_type`] = field.fieldType
-      }
-      submitData.formData = JSON.stringify(extraFields)
-      submitData.remark = formData._remark || ''
-
-      const res = await registrationApi.updateByVisitor(editingRegistration.id, submitData)
-      if (res.success) {
-        wx.showToast({
-          title: '修改成功',
-          icon: 'success'
-        })
-        this.hideEditForm()
-        this.loadRegistrations(phone)
-      } else {
-        wx.showToast({
-          title: res.message || '修改失败',
-          icon: 'none'
-        })
-      }
-    } catch (error) {
-      console.error('修改报名失败:', error)
-      wx.showToast({
-        title: '修改失败',
-        icon: 'none'
-      })
-    } finally {
-      this.setData({ loading: false })
-    }
+    })
   },
 
   getStatusText(status) {

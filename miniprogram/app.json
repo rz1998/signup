@@ -3,6 +3,8 @@
     "pages/index/index",
     "pages/activity/activity",
     "pages/my-registration/my-registration",
+    "pages/visitor/success/success",
+    "pages/visitor/edit/edit",
     "pages/login/login"
   ],
   "subpackages": [

@@ -42,6 +42,7 @@
       <view class="actions">
         <button wx:if="{{canManageActivities}}" size="mini" catchtap="showEditForm" data-activity="{{item}}">编辑</button>
         <button size="mini" type="primary" catchtap="goToSettings" data-activity="{{item}}">页面设置</button>
+        <button wx:if="{{canManageActivities}}" size="mini" catchtap="goToConfig" data-activity="{{item}}">表单配置</button>
         <button size="mini" type="warn" catchtap="onSelectShare" data-activity="{{item}}" open-type="share">分享</button>
         <button wx:if="{{canDeleteActivities}}" size="mini" type="warn" catchtap="deleteActivity" data-id="{{item.id}}">删除</button>
       </view>

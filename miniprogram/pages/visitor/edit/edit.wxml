@@ -1,0 +1,203 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{!registration}}" class="empty">
+    <text>报名信息不存在</text>
+    <button class="btn-back" bindtap="goBack">返回</button>
+  </view>
+
+  <view wx:elif="{{activity && activity.status !== 'active'}}" class="notice">
+    <text>该活动已结束报名，无法修改</text>
+    <button class="btn-back" bindtap="goBack">返回</button>
+  </view>
+
+  <view wx:else class="edit-form">
+    <!-- 活动信息头部 -->
+    <view class="activity-header" wx:if="{{activity}}">
+      <view class="activity-name">{{activity.pageTitle || activity.name}}</view>
+      <view class="activity-info">
+        <text wx:if="{{activity.startDate}}">{{activity.startDate}}</text>
+        <text wx:if="{{activity.location}}"> · {{activity.location}}</text>
+      </view>
+    </view>
+
+    <!-- 当前状态 -->
+    <view class="status-bar">
+      <text class="status-label">当前状态：</text>
+      <text class="status-value status-{{registration.status}}">{{statusText}}</text>
+    </view>
+
+    <!-- 报名表单 -->
+    <view class="form-section">
+      <view class="section-title">报名信息</view>
+
+      <!-- 固定字段：姓名 -->
+      <view class="form-item" wx:if="{{nameField}}">
+        <text class="label">{{nameField.fieldName}}{{nameField.isRequired ? ' *' : ''}}</text>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="请输入姓名"
+          value="{{formData.name}}"
+          bindinput="onNameInput"
+        />
+      </view>
+
+      <!-- 固定字段：手机号 -->
+      <view class="form-item" wx:if="{{phoneField}}">
+        <text class="label">{{phoneField.fieldName}}{{phoneField.isRequired ? ' *' : ''}}</text>
+        <input 
+          class="input" 
+          type="number" 
+          placeholder="请输入手机号"
+          value="{{formData.phone}}"
+          bindinput="onPhoneInput"
+          maxlength="11"
+        />
+      </view>
+
+      <!-- 动态表单字段 -->
+      <view wx:for="{{customFields}}" wx:key="id" class="form-item">
+        <text class="label">{{item.fieldName}}{{item.isRequired ? ' *' : ''}}</text>
+        
+        <!-- 文本/邮箱 -->
+        <input 
+          wx:if="{{item.fieldType === 'text' || item.fieldType === 'email'}}" 
+          class="input" 
+          type="{{item.fieldType === 'email' ? 'text' : 'text'}}"
+          placeholder="{{getPlaceholder(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 数字 -->
+        <input 
+          wx:elif="{{item.fieldType === 'number'}}" 
+          class="input" 
+          type="number"
+          placeholder="{{getPlaceholder(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 手机号 -->
+        <input 
+          wx:elif="{{item.fieldType === 'tel'}}" 
+          class="input" 
+          type="number"
+          placeholder="{{getPlaceholder(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+          maxlength="11"
+        />
+        
+        <!-- 多行文本 -->
+        <textarea 
+          wx:elif="{{item.fieldType === 'textarea'}}" 
+          class="textarea" 
+          placeholder="{{getPlaceholder(item.fieldType)}}"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 日期选择 -->
+        <picker 
+          wx:elif="{{item.fieldType === 'date'}}" 
+          mode="date" 
+          bindchange="onFieldInput"
+          data-field="{{item.id}}"
+        >
+          <view class="input picker-view">
+            {{formData[item.id] || '请选择日期'}}
+          </view>
+        </picker>
+        
+        <!-- 单选 -->
+        <radio-group 
+          wx:elif="{{item.fieldType === 'radio'}}" 
+          bindchange="onRadioChange"
+          data-field="{{item.id}}"
+        >
+          <view class="radio-group">
+            <label wx:for="{{item.optionsArray}}" wx:key="index" class="radio-label">
+              <radio value="{{item.value}}" checked="{{formData[item.id] === item.value}}" color="#1890ff"/>
+              <text>{{item.label}}</text>
+            </label>
+          </view>
+        </radio-group>
+        
+        <!-- 多选 -->
+        <checkbox-group 
+          wx:elif="{{item.fieldType === 'checkbox'}}" 
+          bindchange="onCheckboxChange"
+          data-field="{{item.id}}"
+        >
+          <view class="checkbox-group">
+            <label wx:for="{{item.optionsArray}}" wx:key="index" class="checkbox-label">
+              <checkbox value="{{item.value}}" checked="{{formData[item.id] && formData[item.id].includes(item.value)}}" color="#1890ff"/>
+              <text>{{item.label}}</text>
+            </label>
+          </view>
+        </checkbox-group>
+        
+        <!-- 下拉选择 -->
+        <picker 
+          wx:elif="{{item.fieldType === 'select'}}" 
+          mode="selector" 
+          range="{{item.optionsArray}}" 
+          range-key="label"
+          bindchange="onSelectChange"
+          data-field="{{item.id}}"
+        >
+          <view class="input picker-view">
+            {{formData[item.id] || '请选择'}}
+          </view>
+        </picker>
+        
+        <!-- 默认文本输入 -->
+        <input 
+          wx:else 
+          class="input" 
+          type="text"
+          placeholder="请输入"
+          value="{{formData[item.id]}}"
+          bindinput="onFieldInput"
+          data-field="{{item.id}}"
+        />
+        
+        <!-- 错误提示 -->
+        <text class="field-error" wx:if="{{fieldErrors[item.id]}}">{{fieldErrors[item.id]}}</text>
+      </view>
+
+      <!-- 备注 -->
+      <view class="form-item">
+        <text class="label">备注</text>
+        <textarea 
+          class="textarea" 
+          placeholder="请输入备注信息（选填）"
+          value="{{formData._remark || remark}}"
+          bindinput="onRemarkInput"
+        />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button 
+        class="btn-submit" 
+        bindtap="handleSubmit"
+        loading="{{submitting}}"
+        disabled="{{submitting}}"
+      >
+        {{submitting ? '保存中...' : '保存修改'}}
+      </button>
+      <button class="btn-cancel" bindtap="goBack">取消</button>
+    </view>
+  </view>
+</view>
