@@ -62,11 +62,6 @@
         <view class="menu-icon">👥</view>
         <view class="menu-label">用户管理</view>
       </view>
-      <!-- 页面设置: admin + mgr 可见 -->
-      <view wx:if="{{canManageActivities}}" class="menu-item" bindtap="navigateTo" data-url="/pages/admin/settings/settings">
-        <view class="menu-icon">🎨</view>
-        <view class="menu-label">页面设置</view>
-      </view>
       <view class="menu-item" bindtap="navigateTo" data-url="/pages/admin/profile/profile">
         <view class="menu-icon">⚙️</view>
         <view class="menu-label">个人设置</view>
