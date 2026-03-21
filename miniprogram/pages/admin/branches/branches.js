@@ -207,10 +207,13 @@ Page({
       return
     }
 
+    const { selectedUser } = this.data
     const submitData = {
       name: formData.name,
       companyId: formData.companyId,
       leaderId: selectedUserId || '',
+      leaderName: selectedUser?.name || '',
+      leaderPhone: selectedUser?.phone || '',
       description: formData.description || '',
       status: formData.status || 'active'
     }
