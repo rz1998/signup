@@ -233,10 +233,22 @@ func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (*types.UserInfo,
 		req.Status = "active"
 	}
 
+	// 处理可选UUID字段，将空字符串转为nil
+	var companyID, branchID, managerID interface{}
+	if req.CompanyID != "" {
+		companyID = req.CompanyID
+	}
+	if req.BranchID != "" {
+		branchID = req.BranchID
+	}
+	if req.ManagerID != "" {
+		managerID = req.ManagerID
+	}
+
 	_, err = l.svcCtx.DB.Exec(`
 		INSERT INTO users (id, username, password, full_name, email, phone, role, company_id, branch_id, manager_id, status, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, NULLIF($8, ''), NULLIF($9, ''), NULLIF($10, ''), $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`, id, req.Username, string(hashedPassword), req.FullName, req.Email, req.Phone, req.Role, req.CompanyID, req.BranchID, req.ManagerID, req.Status)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`, id, req.Username, string(hashedPassword), req.FullName, req.Email, req.Phone, req.Role, companyID, branchID, managerID, req.Status)
 	if err != nil {
 		return nil, errors.New("创建用户失败: " + err.Error())
 	}

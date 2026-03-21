@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS users (
     full_name VARCHAR(100),
     email VARCHAR(100),
     phone VARCHAR(20),
-    role VARCHAR(20) DEFAULT 'sales' NOT NULL CHECK (role IN ('admin', 'sys_mgr', 'company_mgr', 'branch_mgr', 'mgr', 'sales')),
+    role VARCHAR(20) DEFAULT 'sales' NOT NULL CHECK (role IN ('admin', 'company_admin', 'branch_admin', 'mgr', 'sales')),
     company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
     branch_id UUID REFERENCES branches(id) ON DELETE SET NULL,
     manager_id UUID REFERENCES users(id) ON DELETE SET NULL,

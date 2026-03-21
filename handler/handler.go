@@ -578,6 +578,14 @@ func logoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 func getUserListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req logic.GetUserListReq
+		// 手动解析 query 参数
+		query := r.URL.Query()
+		req.CompanyID = query.Get("companyId")
+		req.BranchID = query.Get("branchId")
+		req.Role = query.Get("role")
+		req.Status = query.Get("status")
+		req.Keyword = query.Get("keyword")
+		// 分页参数使用 httpx.Parse 解析
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
