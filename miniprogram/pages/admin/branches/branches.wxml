@@ -79,13 +79,27 @@
 
         <view class="form-item">
           <text class="label">负责人 *</text>
-          <view class="leader-selector">
-            <view class="leader-selected" wx:if="{{selectedUser}}" bindtap="showUserSelector">
-              <text class="leader-name">{{selectedUser.name}}</text>
-              <text class="leader-phone">{{selectedUser.phone}}</text>
+          <view class="leader-selector" bindtap="showUserSelector">
+            <!-- 已选择负责人 -->
+            <view wx:if="{{selectedUser}}" class="leader-selected-card">
+              <view class="leader-avatar">
+                <text class="avatar-text">{{selectedUser.name.substr(0,1)}}</text>
+              </view>
+              <view class="leader-info">
+                <text class="leader-name">{{selectedUser.name}}</text>
+                <text class="leader-phone">{{selectedUser.phone}}</text>
+              </view>
+              <view class="leader-actions">
+                <view class="change-btn">更换</view>
+                <view class="clear-btn" catchtap="clearSelectedUser">×</view>
+              </view>
             </view>
-            <button wx:else size="mini" type="primary" bindtap="showUserSelector">选择负责人</button>
-            <button wx:if="{{selectedUser}}" size="mini" bindtap="clearSelectedUser">清除</button>
+            <!-- 未选择 -->
+            <view wx:else class="leader-empty">
+              <view class="empty-icon">👤</view>
+              <text class="empty-text">请选择机构负责人</text>
+              <view class="select-btn">选择负责人</view>
+            </view>
           </view>
         </view>
 
@@ -105,52 +119,68 @@
   </view>
 
   <!-- 用户选择弹窗 -->
-  <view wx:if="{{showUserPicker}}" class="form-mask">
-    <view class="form-container user-picker-container">
-      <view class="form-header">
-        <view class="form-title">选择负责人</view>
-        <view class="close" bindtap="hideUserPicker">×</view>
+  <view wx:if="{{showUserPicker}}" class="form-mask" catchtap="hideUserPicker">
+    <view class="user-picker-modal" catchtap="stopPropagation">
+      <view class="picker-header">
+        <view class="picker-title">选择负责人</view>
+        <view class="close-icon" bindtap="hideUserPicker">×</view>
       </view>
 
-      <view class="user-picker-toolbar">
-        <input class="search-input" placeholder="搜索用户姓名或电话" bindinput="onUserSearch" value="{{userSearchKey}}" />
-        <button size="mini" type="primary" bindtap="showQuickAddUser">新增用户</button>
+      <view class="picker-toolbar">
+        <view class="search-box">
+          <text class="search-icon">🔍</text>
+          <input class="search-input" placeholder="搜索姓名或电话" bindinput="onUserSearch" value="{{userSearchKey}}" />
+        </view>
+        <view class="add-user-btn" bindtap="showQuickAddUser">+ 新增</view>
       </view>
 
-      <view class="user-list">
-        <view wx:for="{{filteredUserList}}" wx:key="id" class="user-item {{item.id === selectedUserId ? 'selected' : ''}}" bindtap="selectUser" data-user="{{item}}">
-          <view class="user-info">
-            <text class="user-name">{{item.name}}</text>
-            <text class="user-phone">{{item.phone}}</text>
+      <scroll-view class="user-scroll-list" scroll-y>
+        <view wx:for="{{filteredUserList}}" wx:key="id" class="user-card {{item.id === selectedUserId ? 'selected' : ''}}" bindtap="selectUser" data-user="{{item}}">
+          <view class="user-card-left">
+            <view class="user-avatar-lg">
+              <text class="avatar-text">{{item.name.substr(0,1)}}</text>
+            </view>
+            <view class="user-details">
+              <text class="user-name-lg">{{item.name}}</text>
+              <text class="user-phone-lg">{{item.phone}}</text>
+            </view>
           </view>
-          <view class="user-role">
-            <text class="role-badge">{{item.role === 'branch_admin' ? '机构管理员' : item.role}}</text>
+          <view class="user-card-right">
+            <view class="role-tag {{item.role === 'branch_admin' ? 'admin' : ''}}">
+              {{item.role === 'branch_admin' ? '机构管理员' : '用户'}}
+            </view>
+            <view wx:if="{{item.id === selectedUserId}}" class="selected-check">✓</view>
           </view>
-          <view wx:if="{{item.id === selectedUserId}}" class="check-icon">✓</view>
         </view>
-        <view wx:if="{{filteredUserList.length === 0}}" class="empty">
-          <text>暂无用户</text>
+        
+        <view wx:if="{{filteredUserList.length === 0}}" class="user-empty">
+          <text class="empty-hint">未找到匹配的用户</text>
         </view>
-      </view>
+      </scroll-view>
 
       <!-- 快速新增用户表单 -->
-      <view wx:if="{{showQuickAddUser}}" class="quick-add-form">
-        <view class="quick-add-title">新增用户（设为机构管理员）</view>
-        <view class="form-item">
-          <text class="label">姓名 *</text>
-          <input class="input" value="{{quickAddData.name}}" bindinput="onQuickAddInput" data-field="name" placeholder="请输入姓名" />
+      <view wx:if="{{showQuickAddUser}}" class="quick-add-panel">
+        <view class="quick-add-header">
+          <text class="quick-add-title">新增机构管理员</text>
+          <view class="close-icon-sm" bindtap="cancelQuickAddUser">×</view>
         </view>
-        <view class="form-item">
-          <text class="label">电话 *</text>
-          <input class="input" value="{{quickAddData.phone}}" bindinput="onQuickAddInput" data-field="phone" placeholder="请输入电话" />
+        <view class="quick-add-body">
+          <view class="quick-form-item">
+            <text class="quick-label">姓名</text>
+            <input class="quick-input" value="{{quickAddData.name}}" bindinput="onQuickAddInput" data-field="name" placeholder="请输入姓名" />
+          </view>
+          <view class="quick-form-item">
+            <text class="quick-label">电话</text>
+            <input class="quick-input" value="{{quickAddData.phone}}" bindinput="onQuickAddInput" data-field="phone" placeholder="请输入电话" />
+          </view>
+          <view class="quick-form-item">
+            <text class="quick-label">密码</text>
+            <input class="quick-input" type="password" value="{{quickAddData.password}}" bindinput="onQuickAddInput" data-field="password" placeholder="请输入密码" />
+          </view>
         </view>
-        <view class="form-item">
-          <text class="label">密码 *</text>
-          <input class="input" type="password" value="{{quickAddData.password}}" bindinput="onQuickAddInput" data-field="password" placeholder="请输入密码" />
-        </view>
-        <view class="form-footer">
-          <button bindtap="cancelQuickAddUser">取消</button>
-          <button type="primary" bindtap="confirmQuickAddUser">确认添加</button>
+        <view class="quick-add-footer">
+          <button class="btn-cancel" bindtap="cancelQuickAddUser">取消</button>
+          <button class="btn-confirm" type="primary" bindtap="confirmQuickAddUser">确认添加</button>
         </view>
       </view>
     </view>

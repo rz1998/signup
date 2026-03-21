@@ -288,6 +288,10 @@ Page({
     this.setData({ showUserPicker: false, showQuickAddUser: false, quickAddData: {} })
   },
 
+  stopPropagation() {
+    // 阻止事件冒泡
+  },
+
   onUserSearch(e) {
     const key = e.detail.value.toLowerCase()
     const { userList } = this.data
