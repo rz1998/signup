@@ -41,24 +41,33 @@ type UserInfo struct {
 
 // Company types
 type CompanyInfo struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	AdminUserID   string `json:"adminUserId"`
+	AdminUserName string `json:"adminUserName"`
+	AdminUserPhone string `json:"adminUserPhone"`
+	Status        string `json:"status"`
+	CreatedAt     string `json:"createdAt"`
+	UpdatedAt     string `json:"updatedAt"`
 }
 
 type CreateCompanyReq struct {
-	Name        string `json:"name"`
-	Description string `json:"description,optional"`
-	Status     string `json:"status,default=active"`
+	Name          string `json:"name"`
+	Description   string `json:"description,optional"`
+	AdminUserID   string `json:"adminUserId,optional"`
+	AdminUserName string `json:"adminUserName,optional"`
+	AdminUserPhone string `json:"adminUserPhone,optional"`
+	Status        string `json:"status,default=active"`
 }
 
 type UpdateCompanyReq struct {
-	Name        string `json:"name,optional"`
-	Description string `json:"description,optional"`
-	Status     string `json:"status,optional"`
+	Name          string `json:"name,optional"`
+	Description   string `json:"description,optional"`
+	AdminUserID   string `json:"adminUserId,optional"`
+	AdminUserName string `json:"adminUserName,optional"`
+	AdminUserPhone string `json:"adminUserPhone,optional"`
+	Status        string `json:"status,optional"`
 }
 
 // Branch types

@@ -53,19 +53,23 @@ func (l *GetCompanyListLogic) GetCompanyList(req *types.PaginationReq) (map[stri
 	var err error
 	if req.Keyword != "" {
 		rows, err = l.svcCtx.DB.Query(`
-			SELECT id, name, description, status, created_at, updated_at
-			FROM companies 
-			WHERE deleted_at IS NULL 
-			AND name LIKE $1
-			ORDER BY created_at DESC
+			SELECT c.id, c.name, c.description, c.admin_user_id, c.status, c.created_at, c.updated_at,
+			       u.full_name, u.phone
+			FROM companies c
+			LEFT JOIN users u ON c.admin_user_id = u.id
+			WHERE c.deleted_at IS NULL 
+			AND c.name LIKE $1
+			ORDER BY c.created_at DESC
 			LIMIT $2 OFFSET $3
 		`, "%"+req.Keyword+"%", req.PageSize, offset)
 	} else {
 		rows, err = l.svcCtx.DB.Query(`
-			SELECT id, name, description, status, created_at, updated_at
-			FROM companies 
-			WHERE deleted_at IS NULL
-			ORDER BY created_at DESC
+			SELECT c.id, c.name, c.description, c.admin_user_id, c.status, c.created_at, c.updated_at,
+			       u.full_name, u.phone
+			FROM companies c
+			LEFT JOIN users u ON c.admin_user_id = u.id
+			WHERE c.deleted_at IS NULL
+			ORDER BY c.created_at DESC
 			LIMIT $1 OFFSET $2
 		`, req.PageSize, offset)
 	}
@@ -78,8 +82,13 @@ func (l *GetCompanyListLogic) GetCompanyList(req *types.PaginationReq) (map[stri
 	for rows.Next() {
 		var company types.CompanyInfo
 		var description sql.NullString
-		if err := rows.Scan(&company.ID, &company.Name, &description, &company.Status, &company.CreatedAt, &company.UpdatedAt); err == nil {
+		var adminUserID sql.NullString
+		var adminUserName, adminUserPhone sql.NullString
+		if err := rows.Scan(&company.ID, &company.Name, &description, &adminUserID, &company.Status, &company.CreatedAt, &company.UpdatedAt, &adminUserName, &adminUserPhone); err == nil {
 			company.Description = description.String
+			company.AdminUserID = adminUserID.String
+			company.AdminUserName = adminUserName.String
+			company.AdminUserPhone = adminUserPhone.String
 			companies = append(companies, company)
 		}
 	}
@@ -110,14 +119,22 @@ func NewGetCompanyLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetCom
 func (l *GetCompanyLogic) GetCompany(id string) (*types.CompanyInfo, error) {
 	var company types.CompanyInfo
 	var description sql.NullString
+	var adminUserID sql.NullString
+	var adminUserName, adminUserPhone sql.NullString
 	err := l.svcCtx.DB.QueryRow(`
-		SELECT id, name, description, status, created_at, updated_at
-		FROM companies WHERE id = $1 AND deleted_at IS NULL
-	`, id).Scan(&company.ID, &company.Name, &description, &company.Status, &company.CreatedAt, &company.UpdatedAt)
+		SELECT c.id, c.name, c.description, c.admin_user_id, c.status, c.created_at, c.updated_at,
+		       u.full_name, u.phone
+		FROM companies c
+		LEFT JOIN users u ON c.admin_user_id = u.id
+		WHERE c.id = $1 AND c.deleted_at IS NULL
+	`, id).Scan(&company.ID, &company.Name, &description, &adminUserID, &company.Status, &company.CreatedAt, &company.UpdatedAt, &adminUserName, &adminUserPhone)
 	if err != nil {
 		return nil, errors.New("公司不存在")
 	}
 	company.Description = description.String
+	company.AdminUserID = adminUserID.String
+	company.AdminUserName = adminUserName.String
+	company.AdminUserPhone = adminUserPhone.String
 	return &company, nil
 }
 
@@ -144,20 +161,23 @@ func (l *CreateCompanyLogic) CreateCompany(req *types.CreateCompanyReq) (*types.
 	}
 
 	_, err := l.svcCtx.DB.Exec(`
-		INSERT INTO companies (id, name, description, status, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-	`, id, req.Name, req.Description, req.Status)
+		INSERT INTO companies (id, name, description, admin_user_id, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`, id, req.Name, req.Description, req.AdminUserID, req.Status)
 	if err != nil {
 		return nil, errors.New("创建公司失败: " + err.Error())
 	}
 
 	return &types.CompanyInfo{
-		ID:          id,
-		Name:        req.Name,
-		Description: req.Description,
-		Status:      req.Status,
-		CreatedAt:   time.Now().Format("2006-01-02T15:04:05Z"),
-		UpdatedAt:   time.Now().Format("2006-01-02T15:04:05Z"),
+		ID:            id,
+		Name:          req.Name,
+		Description:   req.Description,
+		AdminUserID:   req.AdminUserID,
+		AdminUserName: req.AdminUserName,
+		AdminUserPhone: req.AdminUserPhone,
+		Status:        req.Status,
+		CreatedAt:     time.Now().Format("2006-01-02T15:04:05Z"),
+		UpdatedAt:     time.Now().Format("2006-01-02T15:04:05Z"),
 	}, nil
 }
 
@@ -186,6 +206,11 @@ func (l *UpdateCompanyLogic) UpdateCompany(id string, req *types.UpdateCompanyRe
 	if req.Description != "" {
 		setClauses = append(setClauses, fmt.Sprintf("description = $%d", argNum))
 		args = append(args, req.Description)
+		argNum++
+	}
+	if req.AdminUserID != "" {
+		setClauses = append(setClauses, fmt.Sprintf("admin_user_id = $%d", argNum))
+		args = append(args, req.AdminUserID)
 		argNum++
 	}
 	if req.Status != "" {
