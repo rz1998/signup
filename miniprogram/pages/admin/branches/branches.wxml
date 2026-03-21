@@ -146,8 +146,8 @@
             </view>
           </view>
           <view class="user-card-right">
-            <view class="role-tag {{item.role === 'branch_admin' ? 'admin' : ''}}">
-              {{item.role === 'branch_admin' ? '机构管理员' : '用户'}}
+            <view class="role-tag {{item.role === 'company_admin' || item.role === 'branch_admin' ? 'admin' : ''}}">
+              {{item.role === 'company_admin' ? '公司管理员' : (item.role === 'branch_admin' ? '机构管理员' : '用户')}}
             </view>
             <view wx:if="{{item.id === selectedUserId}}" class="selected-check">✓</view>
           </view>

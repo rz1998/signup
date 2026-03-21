@@ -193,6 +193,7 @@ Page({
   // 用户选择相关
   async loadUsers() {
     try {
+      // 公司管理员只能由 company_admin 角色的用户担任
       const res = await userApi.list(1, 100, { role: 'company_admin' })
       if (res.success && res.data) {
         const list = res.data.users || []

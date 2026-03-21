@@ -265,7 +265,8 @@ Page({
   // 用户选择相关
   async loadUsers() {
     try {
-      const res = await userApi.list(1, 100, { role: 'branch_admin' })
+      // 分支机构负责人可由机构管理员或公司管理员担任
+      const res = await userApi.list(1, 100, { role: 'branch_admin,company_admin' })
       if (res.success && res.data) {
         const list = res.data.users || []
         this.setData({

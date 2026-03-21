@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -64,9 +64,21 @@ func (l *GetUserListLogic) GetUserList(req *GetUserListReq) (map[string]interfac
 	}
 
 	if req.Role != "" {
-		whereClause += fmt.Sprintf(" AND u.role = $%d", argNum)
-		args = append(args, req.Role)
-		argNum++
+		// 支持多角色查询，用逗号分隔，如 "company_admin,branch_admin"
+		if strings.Contains(req.Role, ",") {
+			roles := strings.Split(req.Role, ",")
+			rolePlaceholders := []string{}
+			for _, role := range roles {
+				rolePlaceholders = append(rolePlaceholders, fmt.Sprintf("$%d", argNum))
+				args = append(args, strings.TrimSpace(role))
+				argNum++
+			}
+			whereClause += fmt.Sprintf(" AND u.role IN (%s)", strings.Join(rolePlaceholders, ", "))
+		} else {
+			whereClause += fmt.Sprintf(" AND u.role = $%d", argNum)
+			args = append(args, req.Role)
+			argNum++
+		}
 	}
 
 	if req.Status != "" {
